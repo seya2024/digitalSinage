@@ -80,7 +80,6 @@
     border-radius: 10px;
     margin-bottom: 1rem;
     position: relative;
-    animation: slideIn 0.3s ease;
 }
 
 .alert-message.success {
@@ -101,7 +100,6 @@
 
 .alert-message span {
     flex: 1;
-    font-size: 0.9rem;
 }
 
 .alert-close {
@@ -110,7 +108,6 @@
     cursor: pointer;
     color: inherit;
     opacity: 0.7;
-    transition: opacity 0.2s;
 }
 
 .alert-close:hover {
@@ -175,11 +172,6 @@
     color: white;
 }
 
-.role-badge.user {
-    background: #e5e7eb;
-    color: #374151;
-}
-
 /* Profile Info Section */
 .profile-info-section {
     padding: 1.5rem;
@@ -212,10 +204,6 @@
     gap: 0.3rem;
 }
 
-.info-label i {
-    font-size: 0.7rem;
-}
-
 .info-value {
     font-size: 1rem;
     font-weight: 600;
@@ -237,11 +225,6 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-}
-
-.profile-form,
-.password-form {
-    max-width: 500px;
 }
 
 .form-group {
@@ -417,17 +400,6 @@
     to {
         opacity: 1;
         transform: translateY(0);
-    }
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
     }
 }
 

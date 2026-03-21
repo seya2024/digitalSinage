@@ -4,7 +4,7 @@ import { userService } from '../../services/userService';
 import './ProfileManager.css';
 
 const ProfileManager = () => {
-    const { user, logout } = useAuth();
+    const { user, updateUser, changePassword } = useAuth();
     const [profile, setProfile] = useState({
         username: '',
         email: '',
@@ -53,9 +53,7 @@ const ProfileManager = () => {
             if (response.success) {
                 showMessage('success', 'Profile updated successfully');
                 setEditMode(false);
-                // Update local user data
-                const updatedUser = { ...user, username: profile.username, email: profile.email };
-                localStorage.setItem('user', JSON.stringify(updatedUser));
+                updateUser({ username: profile.username, email: profile.email });
             } else {
                 showMessage('error', response.message || 'Failed to update profile');
             }
@@ -84,12 +82,9 @@ const ProfileManager = () => {
 
         setLoading(true);
         try {
-            const response = await userService.changePassword(user.id, {
-                current_password: passwordData.current_password,
-                new_password: passwordData.new_password
-            });
+            const result = await changePassword(passwordData.current_password, passwordData.new_password);
             
-            if (response.success) {
+            if (result.success) {
                 showMessage('success', 'Password changed successfully');
                 setPasswordData({
                     current_password: '',
@@ -98,7 +93,7 @@ const ProfileManager = () => {
                 });
                 setShowPasswordForm(false);
             } else {
-                showMessage('error', response.message || 'Failed to change password');
+                showMessage('error', result.error || 'Failed to change password');
             }
         } catch (error) {
             showMessage('error', error.response?.data?.message || 'Failed to change password');
@@ -394,10 +389,6 @@ const ProfileManager = () => {
                     <div className="tip-item">
                         <i className="fas fa-check-circle"></i>
                         <span>Change your password regularly</span>
-                    </div>
-                    <div className="tip-item">
-                        <i className="fas fa-check-circle"></i>
-                        <span>Enable two-factor authentication for extra security</span>
                     </div>
                     <div className="tip-item">
                         <i className="fas fa-check-circle"></i>

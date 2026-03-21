@@ -9,6 +9,7 @@ import UserManagement from './UserManagement';
 import TVDashboardPreview from './TVDashboardPreview';
 import { currencyService } from '../../services/currencyService';
 import './AdminPanel.css';
+import ProfileManager from './ProfileManager';
 
 // Rate History Component - Fixed with safe number formatting
 const RateHistory = () => {
