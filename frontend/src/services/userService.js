@@ -38,7 +38,7 @@ export const userService = {
     }
 ,
     // Change user password
-changePassword: async (userId, passwordData) => {
+   changePassword: async (userId, passwordData) => {
     try {
         const response = await api.post(`/users/${userId}/change-password`, passwordData);
         return response.data;

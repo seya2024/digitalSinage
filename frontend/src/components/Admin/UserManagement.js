@@ -421,7 +421,7 @@ const UserManagement = () => {
                                 <th>Role</th>
                                 <th>Status</th>
                                 <th>Last Login</th>
-                                <th>Created</th>
+                                {/* <th>Created</th> */}
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -472,10 +472,10 @@ const UserManagement = () => {
                                             <span className="never-logged">Never</span>
                                         )}
                                     </td>
-                                    <td className="date-cell">
+                                    {/* <td className="date-cell">
                                         <i className="fas fa-calendar-alt"></i>
                                         {new Date(user.created_at).toLocaleDateString()}
-                                    </td>
+                                    </td> */}
                                     <td className="actions-cell">
                                         <div className="action-buttons">
                                             <button 

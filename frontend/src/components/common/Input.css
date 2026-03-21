@@ -1,0 +1,139 @@
+/* Input Component Styles */
+.input-wrapper {
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+.input-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #374151;
+}
+
+.required-star {
+    color: #ef4444;
+    margin-left: 0.2rem;
+}
+
+.input-container {
+    position: relative;
+    width: 100%;
+}
+
+.input-field {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+    background: white;
+    color: #1f2937;
+}
+
+.input-field.with-icon-left {
+    padding-left: 2.2rem;
+}
+
+.input-field.with-icon-right {
+    padding-right: 2.2rem;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: #003366;
+    box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+}
+
+.input-field.error {
+    border-color: #ef4444;
+}
+
+.input-field.error:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.input-field:disabled {
+    background: #f3f4f6;
+    cursor: not-allowed;
+}
+
+.input-field.readonly {
+    background: #f9fafb;
+    cursor: default;
+}
+
+/* Input Icons */
+.input-icon-left,
+.input-icon-right {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    font-size: 0.9rem;
+}
+
+.input-icon-left {
+    left: 12px;
+}
+
+.input-icon-right {
+    right: 12px;
+}
+
+/* Password Toggle */
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #9ca3af;
+    padding: 0;
+    font-size: 0.9rem;
+}
+
+.password-toggle:hover {
+    color: #374151;
+}
+
+/* Helper Text */
+.input-helper {
+    margin-top: 0.3rem;
+    font-size: 0.7rem;
+    color: #6b7280;
+}
+
+.input-error {
+    margin-top: 0.3rem;
+    font-size: 0.7rem;
+    color: #ef4444;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.input-error::before {
+    content: '⚠';
+    font-size: 0.7rem;
+}
+
+/* Textarea */
+.input-field.textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Select */
+.input-field.select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 2rem;
+}
