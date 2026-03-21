@@ -1,0 +1,425 @@
+/* TV Dashboard Preview Styles */
+.tv-preview-container {
+    background: white;
+    border-radius: 16px;
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.preview-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #1f2937;
+}
+
+.preview-header h3 i {
+    color: #003366;
+}
+
+.expand-btn {
+    background: #f3f4f6;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: #374151;
+    transition: all 0.2s;
+}
+
+.expand-btn:hover {
+    background: #e5e7eb;
+    transform: scale(1.02);
+}
+
+/* Mini TV Dashboard */
+.mini-tv-dashboard {
+    background: linear-gradient(135deg, #0a1a2f 0%, #001529 100%);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.mini-tv-dashboard.expanded-view {
+    min-height: 500px;
+}
+
+/* Mini Header */
+.mini-tv-header {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    padding: 0.8rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #003366;
+}
+
+.mini-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.mini-logo i {
+    font-size: 1.2rem;
+    color: #003366;
+}
+
+.mini-logo span {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 1px;
+}
+
+.mini-datetime {
+    text-align: right;
+}
+
+.mini-date {
+    font-size: 0.7rem;
+    opacity: 0.8;
+    color: white;
+}
+
+.mini-time {
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+    font-family: monospace;
+}
+
+/* Mini Main Content */
+.mini-tv-main {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    min-height: 280px;
+}
+
+.mini-video-section {
+    flex: 0 0 55%;
+    background: #000;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    min-height: 200px;
+}
+
+.mini-video-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 200px;
+}
+
+.mini-video-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.mini-video-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 200px;
+    background: linear-gradient(135deg, #1e2a3a, #0f1a24);
+    color: #888;
+}
+
+.mini-video-placeholder i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.mini-video-placeholder p {
+    font-size: 0.8rem;
+    margin: 0;
+}
+
+.mini-video-caption {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.6rem;
+    color: white;
+    backdrop-filter: blur(5px);
+}
+
+/* Mini Rates Section */
+.mini-rates-section {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    padding: 0.8rem;
+    border: 1px solid rgba(0, 51, 102, 0.3);
+}
+
+.mini-rates-header h4 {
+    margin: 0 0 0.8rem 0;
+    font-size: 0.85rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.mini-rates-header h4 i {
+    color: #003366;
+}
+
+.mini-rates-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.mini-rates-list::-webkit-scrollbar {
+    width: 3px;
+}
+
+.mini-rates-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.mini-rates-list::-webkit-scrollbar-thumb {
+    background: #003366;
+    border-radius: 10px;
+}
+
+.mini-rate-card {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    padding: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.mini-rate-card:hover {
+    background: rgba(0, 0, 0, 0.5);
+    transform: translateX(2px);
+}
+
+.mini-currency-info {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.mini-currency-info i {
+    font-size: 0.8rem;
+    color: #003366;
+}
+
+.mini-currency-code {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: white;
+}
+
+.mini-rate-values {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.mini-sell {
+    font-size: 0.7rem;
+    color: #ff6b6b;
+    font-family: monospace;
+}
+
+.mini-buy {
+    font-size: 0.7rem;
+    color: #51cf66;
+    font-family: monospace;
+}
+
+.more-rates {
+    text-align: center;
+    padding: 0.3rem;
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.6);
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    margin-top: 0.3rem;
+}
+
+/* Mini Footer */
+.mini-tv-footer {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    padding: 0.4rem;
+    border-top: 1px solid rgba(0, 51, 102, 0.3);
+}
+
+.mini-ticker {
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.mini-ticker span {
+    margin-right: 1.5rem;
+}
+
+/* Preview Actions */
+.preview-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    justify-content: flex-end;
+}
+
+.view-full-btn,
+.refresh-preview-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.view-full-btn {
+    background: linear-gradient(135deg, #003366 0%, #001f3f 100%);
+    color: white;
+}
+
+.view-full-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 51, 102, 0.3);
+}
+
+.refresh-preview-btn {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.refresh-preview-btn:hover {
+    background: #e5e7eb;
+    transform: translateY(-2px);
+}
+
+/* Preview Loading */
+.preview-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: white;
+    border-radius: 12px;
+}
+
+.spinner-small {
+    width: 30px;
+    height: 30px;
+    border: 2px solid #e5e7eb;
+    border-top-color: #003366;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 0.5rem;
+}
+
+/* Expanded View */
+.mini-tv-dashboard.expanded-view {
+    min-height: 550px;
+}
+
+.mini-tv-dashboard.expanded-view .mini-tv-main {
+    min-height: 400px;
+}
+
+.mini-tv-dashboard.expanded-view .mini-video-section {
+    min-height: 300px;
+}
+
+.mini-tv-dashboard.expanded-view .mini-rates-list {
+    max-height: 300px;
+}
+
+/* Animations */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .mini-tv-main {
+        flex-direction: column;
+    }
+    
+    .mini-video-section {
+        flex: none;
+        min-height: 180px;
+    }
+    
+    .preview-actions {
+        flex-direction: column;
+    }
+    
+    .view-full-btn,
+    .refresh-preview-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .preview-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .tv-preview-container {
+        padding: 0.8rem;
+    }
+    
+    .mini-rate-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+    
+    .mini-rate-values {
+        align-self: flex-end;
+    }
+}
