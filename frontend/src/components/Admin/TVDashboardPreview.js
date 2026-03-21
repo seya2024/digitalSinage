@@ -9,6 +9,47 @@ const TVDashboardPreview = () => {
     const [currentDateTime, setCurrentDateTime] = useState(new Date());
     const [loading, setLoading] = useState(true);
     const [expanded, setExpanded] = useState(false);
+    const [videoError, setVideoError] = useState(false);
+
+    // Helper function to get proper embed URL
+    const getEmbedUrl = (url, type) => {
+        if (!url) return '';
+        
+        if (type === 'youtube') {
+            // Extract video ID from various YouTube URL formats
+            let videoId = null;
+            const patterns = [
+                /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+                /youtube\.com\/watch\?.*v=([^&\n?#]+)/
+            ];
+            
+            for (const pattern of patterns) {
+                const match = url.match(pattern);
+                if (match) {
+                    videoId = match[1];
+                    break;
+                }
+            }
+            
+            if (videoId) {
+                // Remove any additional parameters
+                videoId = videoId.split('?')[0].split('&')[0];
+                // Use youtube-nocookie.com to avoid embedding restrictions
+                return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=0&controls=1&rel=0&modestbranding=1&showinfo=0&iv_load_policy=3`;
+            }
+            return url;
+        }
+        
+        if (type === 'vimeo') {
+            const match = url.match(/vimeo\.com\/(\d+)/);
+            if (match) {
+                return `https://player.vimeo.com/video/${match[1]}?autoplay=1&title=0&byline=0&portrait=0`;
+            }
+            return url;
+        }
+        
+        return url;
+    };
 
     useEffect(() => {
         loadPreviewData();
@@ -22,6 +63,7 @@ const TVDashboardPreview = () => {
 
     const loadPreviewData = async () => {
         try {
+            setVideoError(false);
             const [ratesRes, videoRes] = await Promise.all([
                 currencyService.getAll(),
                 videoService.getActiveVideo()
@@ -30,14 +72,25 @@ const TVDashboardPreview = () => {
             if (ratesRes.success) {
                 setCurrencies(ratesRes.data || []);
             }
-            if (videoRes.success) {
-                setActiveVideo(videoRes.data);
+            if (videoRes.success && videoRes.data) {
+                // Process video URL to embed format
+                const videoData = {
+                    ...videoRes.data,
+                    embed_url: getEmbedUrl(videoRes.data.video_url, videoRes.data.video_type)
+                };
+                setActiveVideo(videoData);
+            } else {
+                setActiveVideo(null);
             }
         } catch (error) {
             console.error('Error loading preview data:', error);
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleVideoError = () => {
+        setVideoError(true);
     };
 
     const formatNumber = (num) => {
@@ -61,6 +114,7 @@ const TVDashboardPreview = () => {
     });
 
     const { date, time } = formatDateTime(currentDateTime);
+    const hasActiveVideo = activeVideo && activeVideo.status === 'active' && !videoError;
 
     if (loading) {
         return (
@@ -107,14 +161,16 @@ const TVDashboardPreview = () => {
                     <div className="mini-tv-main">
                         {/* Video Section */}
                         <div className="mini-video-section">
-                            {activeVideo ? (
+                            {hasActiveVideo ? (
                                 <div className="mini-video-container">
                                     <iframe
-                                        src={activeVideo.video_url}
+                                        src={activeVideo.embed_url || getEmbedUrl(activeVideo.video_url, activeVideo.video_type)}
                                         title={activeVideo.title}
                                         frameBorder="0"
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                         allowFullScreen
+                                        onError={handleVideoError}
+                                        style={{ width: '100%', height: '100%', border: 'none' }}
                                     ></iframe>
                                     <div className="mini-video-caption">
                                         <i className="fas fa-play-circle"></i>
@@ -123,8 +179,19 @@ const TVDashboardPreview = () => {
                                 </div>
                             ) : (
                                 <div className="mini-video-placeholder">
-                                    <i className="fas fa-video"></i>
-                                    <p>No video available</p>
+                                    {videoError ? (
+                                        <>
+                                            <i className="fas fa-exclamation-triangle"></i>
+                                            <p>Video failed to load</p>
+                                            <small>Click refresh to try again</small>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="fas fa-video-slash"></i>
+                                            <p>No active video</p>
+                                            <small>Video is disabled or unavailable</small>
+                                        </>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -136,6 +203,7 @@ const TVDashboardPreview = () => {
                                     <i className="fas fa-exchange-alt"></i>
                                     Live Exchange Rates
                                 </h4>
+                                <span className="rates-count">{currencies.length} currencies</span>
                             </div>
                             <div className="mini-rates-list">
                                 {currencies.slice(0, expanded ? 10 : 5).map(currency => (
@@ -143,6 +211,7 @@ const TVDashboardPreview = () => {
                                         <div className="mini-currency-info">
                                             <i className={`fas ${currency.icon || 'fa-money-bill-wave'}`}></i>
                                             <span className="mini-currency-code">{currency.code}</span>
+                                            <span className="mini-currency-name">{currency.name}</span>
                                         </div>
                                         <div className="mini-rate-values">
                                             <span className="mini-sell">{formatNumber(currency.sell_rate)}</span>
@@ -162,8 +231,8 @@ const TVDashboardPreview = () => {
                     {/* Footer */}
                     <div className="mini-tv-footer">
                         <div className="mini-ticker">
-                            <span>🏦 Dashen Bank - Authorized by Ethiopian National Bank of Ethiopia</span>
-                            <span>📞 Contact Center: 6333 </span>
+                            <span>🏦 Dashen Bank - Authorized by National Bank of Ethiopia</span>
+                            <span>📞 Contact Center: 6333</span>
                             <span>💱 Competitive Exchange Rates</span>
                         </div>
                     </div>
