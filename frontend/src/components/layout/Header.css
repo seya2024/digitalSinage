@@ -1,0 +1,151 @@
+/* Header Styles */
+.app-header {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid var(--primary-color);
+    position: sticky;
+    top: 0;
+    z-index: var(--z-sticky);
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+/* Logo Section */
+.header-left {
+    flex: 1;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo i {
+    font-size: 2rem;
+    color: var(--primary-color);
+}
+
+.logo-text h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin: 0;
+    color: white;
+}
+
+.logo-text .tagline {
+    font-size: 0.7rem;
+    opacity: 0.8;
+    color: white;
+}
+
+/* Date & Time Section */
+.header-datetime {
+    text-align: right;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+}
+
+.header-datetime .date,
+.header-datetime .time {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: white;
+}
+
+.header-datetime .date i,
+.header-datetime .time i {
+    opacity: 0.7;
+}
+
+.header-datetime .time {
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-family: monospace;
+}
+
+/* User Section */
+.header-user {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 40px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.user-info i {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.username {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: white;
+}
+
+.user-role {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    color: white;
+}
+
+.logout-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0.4rem;
+    border-radius: 50%;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logout-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .app-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 1rem;
+    }
+    
+    .logo {
+        justify-content: center;
+    }
+    
+    .header-datetime {
+        text-align: center;
+    }
+    
+    .header-user {
+        width: 100%;
+        justify-content: center;
+    }
+}

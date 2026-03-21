@@ -33,8 +33,8 @@ export const APP_CONFIG = {
     NAME: 'Dashen Bank Exchange Rate System',
     VERSION: '2.0.0',
     API_URL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
-    DEFAULT_REFRESH_INTERVAL: 30000, // 30 seconds
-    TOKEN_REFRESH_INTERVAL: 5 * 60 * 1000, // 5 minutes
+    DEFAULT_REFRESH_INTERVAL: 30000,
+    TOKEN_REFRESH_INTERVAL: 5 * 60 * 1000,
     DEFAULT_CURRENCY_DECIMALS: 4,
     DATE_FORMAT: 'DD/MM/YYYY',
     TIME_FORMAT: 'HH:mm:ss',
@@ -53,7 +53,7 @@ export const ROLE_LABELS = {
 };
 
 export const ROLE_PERMISSIONS = {
-    [USER_ROLES.SUPER_ADMIN]: ['*'], // All permissions
+    [USER_ROLES.SUPER_ADMIN]: ['*'],
     [USER_ROLES.ADMIN]: [
         'view_rates',
         'request_rate_update',
@@ -88,6 +88,20 @@ export const CURRENCY_SYMBOLS = {
     [CURRENCY_CODES.CAD]: 'C$',
     [CURRENCY_CODES.CHF]: 'CHF',
     [CURRENCY_CODES.AED]: 'د.إ'
+};
+
+// Add CURRENCY_NAMES (missing export)
+export const CURRENCY_NAMES = {
+    [CURRENCY_CODES.USD]: 'United States Dollar',
+    [CURRENCY_CODES.EUR]: 'Euro',
+    [CURRENCY_CODES.GBP]: 'British Pound',
+    [CURRENCY_CODES.JPY]: 'Japanese Yen',
+    [CURRENCY_CODES.CNY]: 'Chinese Yuan',
+    [CURRENCY_CODES.SAR]: 'Saudi Riyal',
+    [CURRENCY_CODES.AUD]: 'Australian Dollar',
+    [CURRENCY_CODES.CAD]: 'Canadian Dollar',
+    [CURRENCY_CODES.CHF]: 'Swiss Franc',
+    [CURRENCY_CODES.AED]: 'UAE Dirham'
 };
 
 export const CURRENCY_FLAGS = {
@@ -210,7 +224,6 @@ export const PAGINATION = {
 
 // ==================== Messages ====================
 export const MESSAGES = {
-    // Success messages
     LOGIN_SUCCESS: 'Login successful',
     LOGOUT_SUCCESS: 'Logged out successfully',
     PASSWORD_CHANGED: 'Password changed successfully',
@@ -220,8 +233,6 @@ export const MESSAGES = {
     VIDEO_ADDED: 'Video added successfully',
     VIDEO_UPDATED: 'Video updated successfully',
     VIDEO_DELETED: 'Video deleted successfully',
-    
-    // Error messages
     LOGIN_FAILED: 'Invalid username or password',
     NETWORK_ERROR: 'Network error. Please check your connection',
     SERVER_ERROR: 'Server error. Please try again later',
@@ -229,10 +240,8 @@ export const MESSAGES = {
     UNAUTHORIZED: 'You are not authorized to perform this action',
     NOT_FOUND: 'Resource not found',
     VALIDATION_ERROR: 'Please check the form for errors',
-    
-    // Confirmation messages
     CONFIRM_DELETE: 'Are you sure you want to delete this item?',
-    CONFIRM_DELETE_CURRENCY: 'Are you sure you want to delete this currency? This action cannot be undone.',
+    CONFIRM_DELETE_CURRENCY: 'Are you sure you want to delete this currency?',
     CONFIRM_LOGOUT: 'Are you sure you want to logout?'
 };
 
@@ -278,6 +287,7 @@ export const FLAG_CODES = {
     'KES': 'ke'
 };
 
+// Default export
 export default {
     API_ENDPOINTS,
     APP_CONFIG,
@@ -286,6 +296,7 @@ export default {
     ROLE_PERMISSIONS,
     CURRENCY_CODES,
     CURRENCY_SYMBOLS,
+    CURRENCY_NAMES,
     CURRENCY_FLAGS,
     SUBJECT_TYPES,
     SUBJECT_TYPE_LABELS,

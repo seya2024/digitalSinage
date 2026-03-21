@@ -37,32 +37,130 @@ class Video {
     }
 
     static async create(videoData, userId) {
-        const { title, description, video_url, video_type, thumbnail_url, duration, display_order, start_date, end_date, status } = videoData;
-        const [result] = await pool.execute(
-            `INSERT INTO videos 
-             (title, description, video_url, video_type, thumbnail_url, duration, display_order, start_date, end_date, status, created_by)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [title, description, video_url, video_type, thumbnail_url, duration, display_order || 0, start_date, end_date, status || 'active', userId]
-        );
-        return result.insertId;
+        try {
+            console.log('📹 Creating video with data:', JSON.stringify(videoData, null, 2));
+            console.log('👤 Created by user ID:', userId);
+            
+            const { 
+                title, 
+                description, 
+                video_url, 
+                video_type, 
+                thumbnail_url, 
+                duration, 
+                display_order, 
+                start_date, 
+                end_date, 
+                status 
+            } = videoData;
+            
+            // Validate required fields
+            if (!title) {
+                throw new Error('Title is required');
+            }
+            if (!video_url) {
+                throw new Error('Video URL is required');
+            }
+            
+            // Prepare values with defaults
+            const values = [
+                title,
+                description || null,
+                video_url,
+                video_type || 'youtube',
+                thumbnail_url || null,
+                duration ? parseInt(duration) : null,
+                display_order ? parseInt(display_order) : 0,
+                start_date || null,
+                end_date || null,
+                status || 'active',
+                userId
+            ];
+            
+            console.log('📝 SQL Values:', values);
+            
+            const [result] = await pool.execute(
+                `INSERT INTO videos 
+                 (title, description, video_url, video_type, thumbnail_url, duration, display_order, start_date, end_date, status, created_by)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                values
+            );
+            
+            console.log('✅ Video created with ID:', result.insertId);
+            return result.insertId;
+            
+        } catch (error) {
+            console.error('❌ Error creating video:', error);
+            throw error;
+        }
     }
 
     static async update(id, videoData) {
-        const { title, description, video_url, video_type, thumbnail_url, duration, status, display_order, start_date, end_date } = videoData;
-        const [result] = await pool.execute(
-            `UPDATE videos 
-             SET title = ?, description = ?, video_url = ?, video_type = ?,
-                 thumbnail_url = ?, duration = ?, status = ?, display_order = ?,
-                 start_date = ?, end_date = ?, updated_at = NOW()
-             WHERE id = ?`,
-            [title, description, video_url, video_type, thumbnail_url, duration, status, display_order, start_date, end_date, id]
-        );
-        return result.affectedRows;
+        try {
+            console.log('📹 Updating video:', id);
+            console.log('📝 Update data:', JSON.stringify(videoData, null, 2));
+            
+            const { 
+                title, 
+                description, 
+                video_url, 
+                video_type, 
+                thumbnail_url,
+                duration, 
+                status, 
+                display_order, 
+                start_date, 
+                end_date 
+            } = videoData;
+            
+            const [result] = await pool.execute(
+                `UPDATE videos 
+                 SET title = ?, 
+                     description = ?, 
+                     video_url = ?, 
+                     video_type = ?,
+                     thumbnail_url = ?,
+                     duration = ?, 
+                     status = ?, 
+                     display_order = ?,
+                     start_date = ?,
+                     end_date = ?,
+                     updated_at = NOW()
+                 WHERE id = ?`,
+                [
+                    title, 
+                    description || null, 
+                    video_url, 
+                    video_type, 
+                    thumbnail_url || null,
+                    duration ? parseInt(duration) : null, 
+                    status, 
+                    display_order ? parseInt(display_order) : 0,
+                    start_date || null,
+                    end_date || null,
+                    id
+                ]
+            );
+            
+            console.log('✅ Video updated, affected rows:', result.affectedRows);
+            return result.affectedRows;
+            
+        } catch (error) {
+            console.error('❌ Error updating video:', error);
+            throw error;
+        }
     }
 
     static async delete(id) {
-        const [result] = await pool.execute('DELETE FROM videos WHERE id = ?', [id]);
-        return result.affectedRows;
+        try {
+            console.log('🗑️ Deleting video:', id);
+            const [result] = await pool.execute('DELETE FROM videos WHERE id = ?', [id]);
+            console.log('✅ Video deleted, affected rows:', result.affectedRows);
+            return result.affectedRows;
+        } catch (error) {
+            console.error('❌ Error deleting video:', error);
+            throw error;
+        }
     }
 }
 

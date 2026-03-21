@@ -7,11 +7,10 @@ import VideoManager from './VideoManager';
 import DashboardStats from './DashboardStats';
 import UserManagement from './UserManagement';
 import TVDashboardPreview from './TVDashboardPreview';
-import ProfileManager from './ProfileManager';  // Add this import
 import { currencyService } from '../../services/currencyService';
 import './AdminPanel.css';
 
-// Rate History Component
+// Rate History Component - Fixed with safe number formatting
 const RateHistory = () => {
     const [currencies, setCurrencies] = useState([]);
     const [selectedCurrency, setSelectedCurrency] = useState(null);
@@ -46,6 +45,7 @@ const RateHistory = () => {
         try {
             const response = await currencyService.getRateHistory(currencyId);
             if (response.success) {
+                // Ensure all numeric values are properly formatted
                 const formattedHistory = (response.data || []).map(item => ({
                     ...item,
                     sell_rate: item.sell_rate ? parseFloat(item.sell_rate) : null,
@@ -262,15 +262,15 @@ const AdminPanel = () => {
         setSidebarOpen(!sidebarOpen);
     };
 
-    const menuItems = [
+    const menuItems = [ /// Menu Items
         { id: 'dashboard', label: 'Dashboard', icon: 'fa-tachometer-alt' },
         { id: 'currencies', label: 'Currency Manager', icon: 'fa-coins' },
         { id: 'pending', label: 'Pending Approvals', icon: 'fa-clock' },
         { id: 'videos', label: 'Video Manager', icon: 'fa-video' },
         { id: 'users', label: 'User Management', icon: 'fa-users' },
-        { id: 'profile', label: 'My Profile', icon: 'fa-user-circle' },  // Add Profile menu item
         { id: 'reports', label: 'Rate History', icon: 'fa-chart-line' },
-        { id: 'settings', label: 'Settings', icon: 'fa-cog' }
+        { id: 'settings', label: 'Settings', icon: 'fa-cog' },
+        { id: 'profile', label: 'My Profile', icon: 'fa-user-circle' }
     ];
 
     const renderContent = () => {
@@ -285,12 +285,12 @@ const AdminPanel = () => {
                 return <VideoManager />;
             case 'users':
                 return <UserManagement />;
-            case 'profile':
-                return <ProfileManager />;  // Add Profile case
             case 'reports':
                 return <RateHistory />;
             case 'settings':
                 return <Settings />;
+             case 'profile':
+                 return <ProfileManager />;
             default:
                 return <DashboardStats />;
         }
@@ -398,6 +398,7 @@ const AdminPanel = () => {
                                     <i className="fas fa-code"></i>
                                     <span>Developed by : Seid Mohammed</span>
                                 </div>
+                                {/* Developer Photo Tooltip */}
                                 <div className="developer-photo-tooltip">
                                     <img 
                                         src="/developer.jpg" 

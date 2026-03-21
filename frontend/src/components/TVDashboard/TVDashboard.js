@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import VideoPlayer from './VideoPlayer';
 import RateCard from './RateCard';
 import { currencyService } from '../../services/currencyService';
@@ -13,16 +13,120 @@ const TVDashboard = () => {
     const [lastUpdate, setLastUpdate] = useState('');
     const [error, setError] = useState(null);
     const [hasActiveVideo, setHasActiveVideo] = useState(false);
+    
+    // Auto-scroll refs
+    const ratesScrollRef = useRef(null);
+    const scrollIntervalRef = useRef(null);
+    const [isAutoScrolling, setIsAutoScrolling] = useState(true);
+    const [scrollDirection, setScrollDirection] = useState('down');
+    const [scrollEnabled, setScrollEnabled] = useState(false);
 
     useEffect(() => {
         loadData();
         const interval = setInterval(loadData, 30000);
         const timeInterval = setInterval(() => setCurrentDateTime(new Date()), 1000);
+        
         return () => {
             clearInterval(interval);
             clearInterval(timeInterval);
+            stopAutoScroll();
         };
     }, []);
+
+    // Check if scrolling is needed and start auto-scroll
+    useEffect(() => {
+        if (!scrollEnabled && currencies.length > 0 && ratesScrollRef.current) {
+            const container = ratesScrollRef.current;
+            const scrollHeight = container.scrollHeight;
+            const clientHeight = container.clientHeight;
+            
+            // Only enable scrolling if content exceeds container height
+            if (scrollHeight > clientHeight + 50) {
+                setScrollEnabled(true);
+                startAutoScroll();
+            }
+        }
+    }, [currencies, scrollEnabled]);
+
+    const startAutoScroll = () => {
+        if (scrollIntervalRef.current) {
+            clearInterval(scrollIntervalRef.current);
+        }
+        
+        if (!ratesScrollRef.current) return;
+        
+        const container = ratesScrollRef.current;
+        const scrollHeight = container.scrollHeight;
+        const clientHeight = container.clientHeight;
+        
+        // Don't scroll if content fits
+        if (scrollHeight <= clientHeight + 50) {
+            setScrollEnabled(false);
+            return;
+        }
+        
+        scrollIntervalRef.current = setInterval(() => {
+            if (!ratesScrollRef.current || !isAutoScrolling) return;
+            
+            const container = ratesScrollRef.current;
+            const currentScrollTop = container.scrollTop;
+            const maxScrollTop = container.scrollHeight - container.clientHeight;
+            const scrollSpeed = 0.8; // Very slow scroll
+            
+            if (scrollDirection === 'down') {
+                if (currentScrollTop + scrollSpeed >= maxScrollTop) {
+                    // Reached bottom, change direction
+                    setScrollDirection('up');
+                    container.scrollTop = maxScrollTop - scrollSpeed;
+                } else {
+                    container.scrollTop = currentScrollTop + scrollSpeed;
+                }
+            } else {
+                if (currentScrollTop - scrollSpeed <= 0) {
+                    // Reached top, change direction
+                    setScrollDirection('down');
+                    container.scrollTop = scrollSpeed;
+                } else {
+                    container.scrollTop = currentScrollTop - scrollSpeed;
+                }
+            }
+        }, 60); // 60ms interval
+    };
+
+    const stopAutoScroll = () => {
+        if (scrollIntervalRef.current) {
+            clearInterval(scrollIntervalRef.current);
+            scrollIntervalRef.current = null;
+        }
+    };
+
+    const handleManualScroll = () => {
+        if (!isAutoScrolling) return;
+        
+        // Pause auto-scroll when user manually scrolls
+        setIsAutoScrolling(false);
+        stopAutoScroll();
+        
+        // Resume auto-scroll after 15 seconds of inactivity
+        setTimeout(() => {
+            setIsAutoScrolling(true);
+            if (scrollEnabled) {
+                startAutoScroll();
+            }
+        }, 15000);
+    };
+
+    const handleMouseEnter = () => {
+        if (scrollEnabled) {
+            stopAutoScroll();
+        }
+    };
+
+    const handleMouseLeave = () => {
+        if (scrollEnabled && isAutoScrolling) {
+            startAutoScroll();
+        }
+    };
 
     const loadData = async () => {
         try {
@@ -47,7 +151,6 @@ const TVDashboard = () => {
                 setError('Failed to load exchange rates');
             }
             
-            // Check if there's an active video (not null and status is active)
             const hasVideo = videoRes.success && videoRes.data !== null && videoRes.data.status === 'active';
             setHasActiveVideo(hasVideo);
             setActiveVideo(hasVideo ? videoRes.data : null);
@@ -76,6 +179,9 @@ const TVDashboard = () => {
 
     const { date, time } = formatDateTime(currentDateTime);
 
+    // Calculate if scrolling is possible
+    const canScroll = currencies.length > 6; // If more than 6 currencies, scrolling is possible
+
     if (loading) {
         return (
             <div className="tv-loading">
@@ -91,7 +197,10 @@ const TVDashboard = () => {
                 <div className="tv-logo">
                     <i className="fas fa-landmark"></i>
                     <h1>DASHEN BANK</h1>
-                    <span className="tv-tagline">Exchange Rate Board</span>
+                    <span className="tv-tagline">Foreign Exchange Market Rates for Major Currencies Against Ethiopian BIRR (ETB)
+
+
+                    </span>
                 </div>
                 <div className="tv-datetime">
                     <div className="tv-date">{date}</div>
@@ -107,10 +216,8 @@ const TVDashboard = () => {
                 </div>
             )}
 
-            {/* Main Content - Dynamic layout based on video availability */}
             {hasActiveVideo ? (
                 <div className="tv-main">
-                    {/* Video Section - 60% width */}
                     <div className="tv-video-section">
                         <VideoPlayer video={activeVideo} />
                         <div className="video-caption">
@@ -118,21 +225,32 @@ const TVDashboard = () => {
                             <span>{activeVideo?.title || 'Promotional Video'}</span>
                         </div>
                     </div>
-
-                    {/* Rates Section - 40% width */}
                     <div className="tv-rates-section">
                         <div className="rates-header">
                             <h2>
                                 <i className="fas fa-exchange-alt"></i>
-                                Live Exchange Rates
+                                Daily Exchange Rates
                             </h2>
                             <div className="last-update">
                                 <i className="fas fa-clock"></i> 
                                 Updated: {lastUpdate || 'Today'}
                             </div>
+                            {canScroll && scrollEnabled && (
+                                <div className="scroll-indicator">
+                                    <i className={`fas fa-arrow-${scrollDirection === 'down' ? 'down' : 'up'}`}></i>
+                                    <span>Auto-scrolling</span>
+                                </div>
+                            )}
                         </div>
                         
-                        <div className="rates-scroll">
+                        <div 
+                            className="rates-scroll" 
+                            ref={ratesScrollRef}
+                            onMouseEnter={handleMouseEnter}
+                            onMouseLeave={handleMouseLeave}
+                            onWheel={handleManualScroll}
+                            onTouchStart={handleManualScroll}
+                        >
                             {currencies.length > 0 ? (
                                 currencies.map((currency, index) => (
                                     <RateCard 
@@ -152,13 +270,12 @@ const TVDashboard = () => {
                     </div>
                 </div>
             ) : (
-                /* Full Screen Rates - No Video Available */
                 <div className="tv-main-fullscreen">
                     <div className="tv-rates-section-fullscreen">
                         <div className="rates-header-fullscreen">
                             <h2>
                                 <i className="fas fa-exchange-alt"></i>
-                                Live Exchange Rates
+                                Live Exchange Rates 
                             </h2>
                             <div className="last-update">
                                 <i className="fas fa-clock"></i> 
@@ -168,12 +285,25 @@ const TVDashboard = () => {
                                 <i className="fas fa-video-slash"></i>
                                 Video Disabled
                             </div>
+                            {canScroll && scrollEnabled && (
+                                <div className="scroll-indicator">
+                                    <i className={`fas fa-arrow-${scrollDirection === 'down' ? 'down' : 'up'}`}></i>
+                                    <span>Auto-scrolling</span>
+                                </div>
+                            )}
                         </div>
                         
-                        <div className="rates-grid-fullscreen">
+                        <div 
+                            className="rates-grid-fullscreen" 
+                            ref={ratesScrollRef}
+                            onMouseEnter={handleMouseEnter}
+                            onMouseLeave={handleMouseLeave}
+                            onWheel={handleManualScroll}
+                            onTouchStart={handleManualScroll}
+                        >
                             {currencies.length > 0 ? (
                                 currencies.map((currency, index) => (
-                                    <RateCardFull 
+                                    <RateCard 
                                         key={currency.id || index} 
                                         currency={currency} 
                                         index={index} 
@@ -194,80 +324,14 @@ const TVDashboard = () => {
             <div className="tv-footer">
                 <div className="ticker">
                     <div className="ticker-content">
-                        <span>🏦 Dashen Bank - Authorized by Ehiopian National Bank of Ethiopia</span>
-                        <span>📞 Contact Center:6333 </span>
+                        <span>🏦 Dashen Bank - Authorized by National Bank of Ethiopia</span>
+                        <span>📞 Contact Center: 8076</span>
                         <span>💱 Competitive Exchange Rates</span>
                         <span>🔒 Safe & Secure Transactions</span>
                         <span>🌟 24/7 Customer Support</span>
                         <span>💰 Best Rates Guaranteed</span>
                     </div>
                 </div>
-            </div>
-        </div>
-    );
-};
-
-// Fullscreen Rate Card Component
-const RateCardFull = ({ currency, index }) => {
-    const [flagError, setFlagError] = useState(false);
-
-    const getCountryCode = (code) => {
-        const mapping = {
-            'USD': 'us', 'EUR': 'eu', 'GBP': 'gb', 'SAR': 'sa', 'CNY': 'cn',
-            'JPY': 'jp', 'AUD': 'au', 'CAD': 'ca', 'CHF': 'ch', 'AED': 'ae'
-        };
-        return mapping[code] || code?.toLowerCase().slice(0, 2);
-    };
-
-    const formatNumber = (num) => {
-        if (num === null || num === undefined) return '0.0000';
-        const n = typeof num === 'string' ? parseFloat(num) : num;
-        return isNaN(n) ? '0.0000' : n.toFixed(4);
-    };
-
-    const sell = currency?.sell_rate !== undefined ? parseFloat(currency.sell_rate) : null;
-    const buy = currency?.buy_rate !== undefined ? parseFloat(currency.buy_rate) : null;
-    const spread = (sell !== null && buy !== null) ? (buy - sell).toFixed(4) : '0.0000';
-    const flagUrl = `https://flagcdn.com/w40/${getCountryCode(currency?.code)}.png`;
-
-    return (
-        <div className="rate-card-full" style={{ animationDelay: `${(index || 0) * 0.05}s` }}>
-            <div className="rate-card-header-full">
-                <div className="currency-icon-full">
-                    {!flagError ? (
-                        <img src={flagUrl} alt={currency?.code} className="currency-flag-full" onError={() => setFlagError(true)} />
-                    ) : (
-                        <i className={`fas ${currency?.icon || 'fa-money-bill-wave'}`}></i>
-                    )}
-                </div>
-                <div className="currency-info-full">
-                    <div className="currency-name-full">{currency?.name || 'Unknown'}</div>
-                    <div className="currency-code-full">{currency?.code || 'N/A'}</div>
-                </div>
-                <div className="trend-icon-full">
-                    <i className="fas fa-chart-line"></i>
-                </div>
-            </div>
-            <div className="rate-card-body-full">
-                <div className="rate-item-full">
-                    <div className="rate-label-full">
-                        <i className="fas fa-arrow-up"></i> SELLING
-                    </div>
-                    <div className="rate-value-full sell-rate-full">{formatNumber(sell)}</div>
-                </div>
-                <div className="rate-divider-full"></div>
-                <div className="rate-item-full">
-                    <div className="rate-label-full">
-                        <i className="fas fa-arrow-down"></i> BUYING
-                    </div>
-                    <div className="rate-value-full buy-rate-full">{formatNumber(buy)}</div>
-                </div>
-            </div>
-            <div className="rate-card-footer-full">
-                <span>ETB per unit</span>
-                <span className="spread-info-full">
-                    <i className="fas fa-chart-simple"></i> Spread: {spread}
-                </span>
             </div>
         </div>
     );

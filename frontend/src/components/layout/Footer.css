@@ -1,0 +1,177 @@
+/* Footer Styles */
+.app-footer {
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 0.8rem 1.5rem;
+    border-top: 1px solid rgba(0, 51, 102, 0.3);
+    margin-top: auto;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Copyright Section */
+.footer-copyright {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.footer-copyright i {
+    color: var(--primary-color);
+}
+
+/* Developer Section */
+.footer-developer-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.footer-developer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.footer-developer i {
+    color: var(--primary-color);
+}
+
+.footer-developer:hover {
+    color: var(--primary-color);
+}
+
+/* Developer Tooltip */
+.developer-photo-tooltip {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    margin-bottom: 1rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    z-index: var(--z-tooltip);
+    min-width: 280px;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.footer-developer-wrapper:hover .developer-photo-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.developer-photo {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+}
+
+.tooltip-info {
+    padding: 1.2rem;
+    text-align: center;
+}
+
+.tooltip-info h4 {
+    margin: 0 0 0.25rem 0;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.tooltip-info p {
+    margin: 0 0 0.5rem 0;
+    color: var(--primary-color);
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.developer-bio {
+    font-size: 0.75rem;
+    line-height: 1.4;
+    margin: 0.75rem 0;
+    color: var(--text-secondary);
+    padding: 0.5rem 0;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 0.75rem;
+}
+
+.social-links a {
+    color: var(--text-secondary);
+    transition: all 0.2s;
+    font-size: 1.1rem;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--bg-tertiary);
+    text-decoration: none;
+}
+
+.social-links a:hover {
+    color: white;
+    background: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+/* Tooltip Arrow */
+.developer-photo-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    right: 20px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.8rem;
+    }
+    
+    .developer-photo-tooltip {
+        right: auto;
+        left: 0;
+        min-width: 260px;
+    }
+    
+    .developer-photo-tooltip::after {
+        right: auto;
+        left: 20px;
+    }
+}

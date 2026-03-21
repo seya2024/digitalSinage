@@ -1,8 +1,6 @@
 import { useState, useCallback } from 'react';
+import { MESSAGES } from '../utils/constants';
 
-/**
- * Custom hook for toast notifications
- */
 export const useToast = () => {
     const [toasts, setToasts] = useState([]);
 
@@ -19,35 +17,27 @@ export const useToast = () => {
         return id;
     }, []);
 
-    const removeToast = useCallback((id) => {
-        setToasts(prev => prev.filter(t => t.id !== id));
-    }, []);
-
-    const clearToasts = useCallback(() => {
-        setToasts([]);
-    }, []);
-
-    const success = useCallback((message, duration) => {
-        return addToast(message, 'success', duration);
+    const success = useCallback((message) => {
+        return addToast(message, 'success');
     }, [addToast]);
 
-    const error = useCallback((message, duration) => {
-        return addToast(message, 'error', duration);
+    const error = useCallback((message) => {
+        return addToast(message || MESSAGES.SERVER_ERROR, 'error');
     }, [addToast]);
 
-    const info = useCallback((message, duration) => {
-        return addToast(message, 'info', duration);
+    const info = useCallback((message) => {
+        return addToast(message, 'info');
     }, [addToast]);
 
-    const warning = useCallback((message, duration) => {
-        return addToast(message, 'warning', duration);
+    const warning = useCallback((message) => {
+        return addToast(message, 'warning');
     }, [addToast]);
 
     return {
         toasts,
         addToast,
-        removeToast,
-        clearToasts,
+        removeToast: (id) => setToasts(prev => prev.filter(t => t.id !== id)),
+        clearToasts: () => setToasts([]),
         success,
         error,
         info,

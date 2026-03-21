@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { currencyService } from '../../services/currencyService';
 import { useAuth } from '../../context/AuthContext';
+import { isValidCurrencyCode, isValidExchangeRate, isValidSpread } from '../../utils/validators';
+import { MESSAGES } from '../../utils/constants';
+
 import './CurrencyManager.css';
 
 // Helper function to safely format numbers
