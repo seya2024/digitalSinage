@@ -1,0 +1,22 @@
+
+PS C:\xampp\htdocs\digitalSigage> 
+PS C:\xampp\htdocs\digitalSigage> cd .\backends
+PS C:\xampp\htdocs\digitalSigage\backend> npm run dev
+
+
+PS C:\xampp\htdocs\digitalSigage> 
+PS C:\xampp\htdocs\digitalSigage> cd .\frontend\
+PS C:\xampp\htdocs\digitalSigage\frontend> npm start       
+
+
+The build folder is ready to be deployed.
+You may serve it with a static server:
+
+  npm install -g serve
+  serve -s build
+
+
+
+
+
+
