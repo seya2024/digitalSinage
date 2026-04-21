@@ -1,23 +1,51 @@
+/* AdminLogin.css - Fixed Version */
 .admin-login-container {
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 1rem;
+    background: linear-gradient(135deg, #002B5C 0%, #004e92 100%);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Decorative background elements */
+.admin-login-container::before {
+    content: '';
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+    top: -150px;
+    right: -150px;
+    border-radius: 50%;
+}
+
+.admin-login-container::after {
+    content: '';
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 70%);
+    bottom: -200px;
+    left: -200px;
+    border-radius: 50%;
 }
 
 .admin-login-card {
     background: white;
     border-radius: 20px;
-    padding: 2.5rem;
-    width: 100%;
-    max-width: 400px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    animation: slideUp 0.5s ease;
+    width: 100%;
+    max-width: 450px;
+    padding: 40px 35px;
+    position: relative;
+    z-index: 1;
+    animation: fadeInUp 0.6s ease-out;
 }
 
-@keyframes slideUp {
+@keyframes fadeInUp {
     from {
         opacity: 0;
         transform: translateY(30px);
@@ -30,108 +58,258 @@
 
 .login-header {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 35px;
 }
 
-.login-header i {
-    font-size: 3rem;
-    color: #003366;
-    margin-bottom: 1rem;
+.logo-icon {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo-image {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    border-radius: 50%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    background: white;
+    padding: 8px;
 }
 
 .login-header h2 {
-    font-size: 1.8rem;
-    color: #003366;
-    margin-bottom: 0.5rem;
+    color: #002B5C;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 15px 0 8px 0;
+    line-height: 1.4;
 }
 
 .login-header p {
     color: #666;
     font-size: 0.9rem;
+    margin: 5px 0;
+}
+
+.login-header small {
+    color: #999;
+    font-size: 0.75rem;
+    display: block;
+    margin-top: 5px;
 }
 
 .login-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+    margin-bottom: 20px;
 }
 
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+/* FIXED: Input group styling - No overflow */
+.input-group {
+    margin-bottom: 25px;
+    position: relative;
 }
 
-.form-group label {
-    font-weight: 600;
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
     color: #333;
-    font-size: 0.9rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.form-group label i {
-    margin-right: 0.5rem;
-    color: #003366;
+/* FIXED: Wrapper for icon and input */
+.input-wrapper {
+    position: relative;
+    width: 100%;
 }
 
-.form-group input {
-    padding: 0.8rem 1rem;
+/* FIXED: Icon positioning - doesn't affect input width */
+.input-icon-left {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    font-size: 1rem;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* FIXED: Password toggle button */
+.password-toggle {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    font-size: 1rem;
+    z-index: 1;
+    transition: color 0.3s ease;
+}
+
+.password-toggle:hover {
+    color: #002B5C;
+}
+
+/* FIXED: Input field - Proper padding to prevent overflow */
+.input-field {
+    width: 100%;
+    padding: 12px 45px 12px 40px;
     border: 2px solid #e0e0e0;
     border-radius: 10px;
-    font-size: 1rem;
-    transition: all 0.3s;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    box-sizing: border-box;
+    /* Ensure proper box model */
 }
 
-.form-group input:focus {
+/* For password without toggle, adjust right padding */
+.input-field:not([type="password"]) {
+    padding-right: 15px;
+}
+
+/* For password field with toggle */
+.input-field[type="password"] {
+    padding-right: 45px;
+}
+
+.input-field:focus {
     outline: none;
-    border-color: #003366;
-    box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+    border-color: #002B5C;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(0, 43, 92, 0.1);
 }
 
+.input-field:disabled {
+    background: #f5f5f5;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Placeholder styling */
+.input-field::placeholder {
+    color: #bbb;
+    font-size: 0.85rem;
+}
+
+/* Error message styling */
 .error-message {
     background: #fee;
     color: #c33;
-    padding: 0.8rem;
+    padding: 12px;
     border-radius: 10px;
-    font-size: 0.9rem;
+    margin-bottom: 20px;
+    font-size: 0.85rem;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 10px;
+    border-left: 4px solid #c33;
+    animation: shake 0.5s ease;
 }
 
-.login-btn {
-    background: #003366;
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.error-message i {
+    font-size: 1rem;
+}
+
+/* Button styling */
+.login-button {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #002B5C 0%, #004e92 100%);
     color: white;
-    padding: 0.8rem;
     border: none;
     border-radius: 10px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 10px;
+    margin-top: 10px;
 }
 
-.login-btn:hover:not(:disabled) {
-    background: #004c99;
+.login-button:hover:not(:disabled) {
     transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0, 43, 92, 0.3);
+    background: linear-gradient(135deg, #003a6b 0%, #005aad 100%);
 }
 
-.login-btn:disabled {
+.login-button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.login-button:disabled {
     opacity: 0.7;
     cursor: not-allowed;
 }
 
 .login-footer {
     text-align: center;
-    margin-top: 1.5rem;
-    padding-top: 1rem;
-    border-top: 1px solid #e0e0e0;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    margin-top: 10px;
 }
 
 .login-footer small {
     color: #999;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .admin-login-card {
+        padding: 30px 25px;
+        max-width: 90%;
+    }
+    
+    .logo-image {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .login-header h2 {
+        font-size: 1.1rem;
+    }
+    
+    .login-header p {
+        font-size: 0.8rem;
+    }
+    
+    .input-field {
+        padding: 10px 40px 10px 35px;
+        font-size: 0.9rem;
+    }
+    
+    .input-field[type="password"] {
+        padding-right: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-login-card {
+        padding: 25px 20px;
+    }
+    
+    .input-field {
+        font-size: 0.85rem;
+    }
 }
