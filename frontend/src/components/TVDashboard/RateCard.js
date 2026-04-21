@@ -107,19 +107,9 @@ const RateCard = ({ currency, index = 0, onClick, showTrend = true }) => {
             
             {/* Card Body - Rates */}
             <div className="rate-card-body">
-                <div className="rate-item sell">
-                    <div className="rate-label">
-                        <i className="fas fa-arrow-up"></i>
-                        SELLING
-                    </div>
-                    <div className="rate-value sell-rate">
-                        {formattedSellRate}
-                    </div>
-                    <div className="rate-unit">ETB</div>
-                </div>
-                
-                <div className="rate-divider"></div>
-                
+              
+              
+                             
                 <div className="rate-item buy">
                     <div className="rate-label">
                         <i className="fas fa-arrow-down"></i>
@@ -127,6 +117,19 @@ const RateCard = ({ currency, index = 0, onClick, showTrend = true }) => {
                     </div>
                     <div className="rate-value buy-rate">
                         {formattedBuyRate}
+                    </div>
+                    <div className="rate-unit">ETB</div>
+                </div>
+                
+                <div className="rate-divider"></div>
+ 
+            <div className="rate-item sell">
+                    <div className="rate-label">
+                        <i className="fas fa-arrow-up"></i>
+                        SELLING
+                    </div>
+                    <div className="rate-value sell-rate">
+                        {formattedSellRate}
                     </div>
                     <div className="rate-unit">ETB</div>
                 </div>

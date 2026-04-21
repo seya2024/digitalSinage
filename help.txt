@@ -1,0 +1,9 @@
+
+cd C:\xampp\htdocs\digitalSigage\backend
+npm run dev
+
+cd C:\xampp\htdocs\digitalSigage\frontend
+npm start
+
+
+pass: admin123
