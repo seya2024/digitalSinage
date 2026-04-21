@@ -57,7 +57,7 @@ const AdminLogin = () => {
                     {/* Username Field */}
                     <div className="input-group">
                         <label>
-                            <i className="fas fa-user"></i> Username *
+                            <i className="fas fa-user"></i> Username 
                         </label>
                         <div className="input-wrapper">
                             <input
@@ -76,7 +76,7 @@ const AdminLogin = () => {
                     {/* Password Field with Toggle */}
                     <div className="input-group">
                         <label>
-                            <i className="fas fa-lock"></i> Password *
+                            <i className="fas fa-lock"></i> Password 
                         </label>
                         <div className="input-wrapper">
                             <input
@@ -131,7 +131,7 @@ const AdminLogin = () => {
 
                 <div className="login-footer">
     <small>
-        <i className="fas fa-shield-alt"></i> Secure system access. All activities are logged.
+        <i className="fas fa-shield-alt"></i> Developed by : Seid Mohammed.
     </small>
     <small style={{ display: 'block', marginTop: '10px' }}>
         <i className="far fa-copyright"></i> 2026 Dashen Bank S.C. All rights reserved.
