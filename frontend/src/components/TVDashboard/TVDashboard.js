@@ -288,17 +288,23 @@ const TVDashboard = () => {
             <header className="tv-header">
                 <div className="header-left">
                     <div className="bank-logo">
-                        <div className="logo-icon">
+                        {/* <div className="logo-icon">
                             <i className="fas fa-landmark"></i>
+                        </div> */}
+
+                        <div className="logo-icon">
+                            <img src="/images/logo.jpg"  alt="Dashen Bank"  className="logo-image"/>
                         </div>
+
                         <div className="logo-text">
-                            <h1>DASHEN BANK</h1>
-                            <span className="logo-subtitle">FOREIGN EXCHANGE MARKET RATES</span>
+                            <h1>ዳሽን ባንክ አ.ማ</h1>
+                            <span className="logo-subtitle">ዕለታዊ የውጭ ምንዛሪ ገበያ ተመኖች</span>
                         </div>
                     </div>
+                    
                     <div className="header-badge">
-                        <span className="badge-eth">ETB</span>
-                        <span className="badge-label">Ethiopian Birr</span>
+                        <span className="badge-eth">Jimma Branch</span>
+                        <span className="badge-label">  </span>
                     </div>
                 </div>
 
@@ -405,16 +411,20 @@ const TVDashboard = () => {
                                         <tbody>
                                             {currencies.length > 0 ? currencies.map((item) => (
                                                 <tr key={item.id} className="rate-row">
+
                                                     <td className="td-currency">
                                                         <span className="flag-box">{item._flag}</span>
                                                         <span className="currency-name-cell">{item._name}</span>
                                                     </td>
+
                                                     <td className="td-code">
                                                         <span className="code-badge">{item._code}</span>
                                                     </td>
+
                                                     <td className="td-buy">
                                                         <span className="rate-val rate-buy">{formatRate(item.buy_rate)}</span>
                                                     </td>
+
                                                     <td className="td-sell">
                                                         <span className="rate-val rate-sell">{formatRate(item.sell_rate)}</span>
                                                     </td>
@@ -514,11 +524,11 @@ const TVDashboard = () => {
 
             {/* Footer Ticker */}
             <footer className="tv-footer">
-                <div className="footer-left">
+                {/* <div className="footer-left">
                     <span className="footer-brand">
                         <i className="fas fa-shield-alt"></i> NBE Licensed
                     </span>
-                </div>
+                </div> */}
                 <div className="ticker-track">
                     <div className="ticker-content">
                         {[...tickerMessages, ...tickerMessages].map((msg, i) => (
