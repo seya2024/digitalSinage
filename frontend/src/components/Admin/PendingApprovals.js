@@ -4,6 +4,7 @@ import { MESSAGES, CHANGE_TYPES, CHANGE_TYPE_LABELS } from '../../utils/constant
 import { formatNumber, formatDate, getRelativeTime } from '../../utils/formatters';
 import Alert from '../common/Alert';
 import Modal from '../common/Modal';
+import ConfirmModal from '../common/ConfirmModal';
 import './PendingApprovals.css';
 
 const PendingApprovals = () => {
@@ -13,6 +14,9 @@ const PendingApprovals = () => {
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [rejectReason, setRejectReason] = useState('');
     const [showRejectModal, setShowRejectModal] = useState(false);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [approveRequestId, setApproveRequestId] = useState(null);
+    const [approveRequestName, setApproveRequestName] = useState('');
     const [filterType, setFilterType] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -42,20 +46,28 @@ const PendingApprovals = () => {
         setTimeout(() => setMessage({ type: '', text: '' }), 5000);
     };
 
-    const handleApprove = async (changeId) => {
-        if (window.confirm('Are you sure you want to approve this request?')) {
-            try {
-                const response = await currencyService.approveChange(changeId);
-                if (response.success) {
-                    showMessage('success', 'Change approved successfully');
-                    loadPendingChanges();
-                } else {
-                    showMessage('error', response.message || 'Failed to approve change');
-                }
-            } catch (error) {
-                console.error('Error approving change:', error);
-                showMessage('error', error.response?.data?.message || 'Failed to approve change');
+    const handleApproveClick = (changeId, currencyName) => {
+        setApproveRequestId(changeId);
+        setApproveRequestName(currencyName);
+        setShowConfirmModal(true);
+    };
+
+    const handleApprove = async () => {
+        try {
+            const response = await currencyService.approveChange(approveRequestId);
+            if (response.success) {
+                showMessage('success', 'Change approved successfully');
+                loadPendingChanges();
+            } else {
+                showMessage('error', response.message || 'Failed to approve change');
             }
+        } catch (error) {
+            console.error('Error approving change:', error);
+            showMessage('error', error.response?.data?.message || 'Failed to approve change');
+        } finally {
+            setShowConfirmModal(false);
+            setApproveRequestId(null);
+            setApproveRequestName('');
         }
     };
 
@@ -305,7 +317,7 @@ const PendingApprovals = () => {
                                     <td className="actions-cell">
                                         <div className="action-buttons">
                                             <button 
-                                                onClick={() => handleApprove(change.id)} 
+                                                onClick={() => handleApproveClick(change.id, change.currency_name)} 
                                                 className="btn-approve"
                                                 title="Approve this request"
                                             >
@@ -328,6 +340,23 @@ const PendingApprovals = () => {
                     </table>
                 </div>
             )}
+
+            {/* Confirm Approve Modal */}
+            <ConfirmModal
+                isOpen={showConfirmModal}
+                onClose={() => {
+                    setShowConfirmModal(false);
+                    setApproveRequestId(null);
+                    setApproveRequestName('');
+                }}
+                onConfirm={handleApprove}
+                title="Approve Request"
+                message={`Are you sure you want to approve this request for "${approveRequestName}"? This action cannot be undone.`}
+                confirmText="Yes, Approve"
+                cancelText="Cancel"
+                confirmVariant="success"
+                icon="check-circle"
+            />
 
             {/* Reject Modal */}
             <Modal

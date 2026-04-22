@@ -17,4 +17,7 @@ router.post('/', protect, superAdminOnly, createVideo);
 router.put('/:id', protect, superAdminOnly, updateVideo);
 router.delete('/:id', protect, superAdminOnly, deleteVideo);
 
+const path = require('path');
+router.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
 module.exports = router;

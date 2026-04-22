@@ -1,0 +1,36 @@
+.confirm-modal-content {
+    text-align: center;
+    padding: 1rem;
+}
+
+.confirm-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.confirm-icon i {
+    color: #ffc107;
+}
+
+.confirm-icon i.fa-exclamation-triangle {
+    color: #ffc107;
+}
+
+.confirm-icon i.fa-question-circle {
+    color: #17a2b8;
+}
+
+.confirm-icon i.fa-trash-alt {
+    color: #dc3545;
+}
+
+.confirm-icon i.fa-check-circle {
+    color: #28a745;
+}
+
+.confirm-message {
+    font-size: 1rem;
+    color: #495057;
+    line-height: 1.5;
+    margin: 0;
+}

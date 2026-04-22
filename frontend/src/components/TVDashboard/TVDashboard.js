@@ -401,12 +401,13 @@ const TVDashboard = () => {
                                     className="rates-table-body"
                                     ref={ratesScrollRef}
                                     onMouseEnter={() => cancelAnimationFrame(scrollAnimRef.current)}
+
                                     onMouseLeave={() => { 
                                         if (isAutoScrolling && scrollEnabledRef.current) startAutoScroll(); 
                                     }}
                                     onWheel={() => pauseAutoScroll(12000)}
-                                    onTouchStart={() => pauseAutoScroll(12000)}
-                                >
+                                    onTouchStart={() => pauseAutoScroll(12000)}>
+                                        
                                     <table className="rates-table">
                                         <tbody>
                                             {currencies.length > 0 ? currencies.map((item) => (

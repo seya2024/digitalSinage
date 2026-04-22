@@ -1,4 +1,6 @@
 const { pool } = require('../config/database');
+const fs = require('fs');
+const path = require('path');
 
 class Video {
     static async getAll(activeOnly = true) {
@@ -51,22 +53,26 @@ class Video {
                 display_order, 
                 start_date, 
                 end_date, 
-                status 
+                status,
+                file_path
             } = videoData;
             
             // Validate required fields
             if (!title) {
                 throw new Error('Title is required');
             }
-            if (!video_url) {
+            if (!video_url && video_type !== 'local') {
                 throw new Error('Video URL is required');
+            }
+            if (video_type === 'local' && !video_url && !file_path) {
+                throw new Error('Video file is required for local videos');
             }
             
             // Prepare values with defaults
             const values = [
                 title,
                 description || null,
-                video_url,
+                video_url || null,
                 video_type || 'youtube',
                 thumbnail_url || null,
                 duration ? parseInt(duration) : null,
@@ -74,15 +80,16 @@ class Video {
                 start_date || null,
                 end_date || null,
                 status || 'active',
-                userId
+                userId,
+                file_path || null
             ];
             
             console.log('📝 SQL Values:', values);
             
             const [result] = await pool.execute(
                 `INSERT INTO videos 
-                 (title, description, video_url, video_type, thumbnail_url, duration, display_order, start_date, end_date, status, created_by)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                 (title, description, video_url, video_type, thumbnail_url, duration, display_order, start_date, end_date, status, created_by, file_path)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 values
             );
             
@@ -110,7 +117,8 @@ class Video {
                 status, 
                 display_order, 
                 start_date, 
-                end_date 
+                end_date,
+                file_path
             } = videoData;
             
             const [result] = await pool.execute(
@@ -125,12 +133,13 @@ class Video {
                      display_order = ?,
                      start_date = ?,
                      end_date = ?,
+                     file_path = ?,
                      updated_at = NOW()
                  WHERE id = ?`,
                 [
                     title, 
                     description || null, 
-                    video_url, 
+                    video_url || null, 
                     video_type, 
                     thumbnail_url || null,
                     duration ? parseInt(duration) : null, 
@@ -138,6 +147,7 @@ class Video {
                     display_order ? parseInt(display_order) : 0,
                     start_date || null,
                     end_date || null,
+                    file_path || null,
                     id
                 ]
             );
@@ -154,9 +164,24 @@ class Video {
     static async delete(id) {
         try {
             console.log('🗑️ Deleting video:', id);
+            
+            // Get file path before deleting
+            const [video] = await pool.execute('SELECT file_path FROM videos WHERE id = ?', [id]);
+            
+            // Delete physical file if exists
+            if (video[0] && video[0].file_path) {
+                const uploadsDir = path.join(__dirname, '../../uploads');
+                const filePath = path.join(uploadsDir, video[0].file_path);
+                if (fs.existsSync(filePath)) {
+                    fs.unlinkSync(filePath);
+                    console.log('🗑️ Deleted file:', filePath);
+                }
+            }
+            
             const [result] = await pool.execute('DELETE FROM videos WHERE id = ?', [id]);
             console.log('✅ Video deleted, affected rows:', result.affectedRows);
             return result.affectedRows;
+            
         } catch (error) {
             console.error('❌ Error deleting video:', error);
             throw error;
