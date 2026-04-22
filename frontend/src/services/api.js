@@ -1,7 +1,23 @@
 import axios from 'axios';
 import { authService } from './authService';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+// Auto-detect API URL based on current hostname
+const getApiUrl = () => {
+    const hostname = window.location.hostname;
+    
+    // If accessing via localhost or 127.0.0.1
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return 'http://localhost:5000/api';
+    }
+    
+    // If accessing via network IP (e.g., 192.168.x.x)
+    // Use the same IP for backend (port 5000)
+    return `http://${hostname}:5000/api`;
+};
+
+const API_URL = process.env.REACT_APP_API_URL || getApiUrl();
+
+console.log('🌐 API Base URL:', API_URL);
 
 const api = axios.create({
     baseURL: API_URL,
@@ -18,6 +34,7 @@ api.interceptors.request.use(
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
+        console.log('🚀 API Request:', config.method.toUpperCase(), config.baseURL + config.url);
         return config;
     },
     (error) => Promise.reject(error)
@@ -28,6 +45,8 @@ api.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
+        
+        console.error('❌ API Error:', error.response?.status, error.config?.url);
         
         // Handle 401 Unauthorized
         if (error.response?.status === 401 && !originalRequest._retry) {

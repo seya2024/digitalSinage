@@ -297,7 +297,7 @@ const TVDashboard = () => {
                         </div> */}
 
                         <div className="logo-text">
-                            <h1>ዳሽን ባንክ አ.ማ</h1>
+                            <h1>ዳሽን ባንክ</h1>
                             <span className="logo-subtitle">ዕለታዊ የውጭ ምንዛሪ ገበያ ተመኖች</span>
                         </div>
                     </div>

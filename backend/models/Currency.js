@@ -40,11 +40,11 @@ class Currency {
     }
 
     static async create(currencyData, userId) {
-        const { name, code, symbol, icon, display_order } = currencyData;
+        const { name, code, symbol, icon, display_order, country_code } = currencyData;
         const [result] = await pool.execute(
-            `INSERT INTO currencies (name, code, symbol, icon, display_order, created_by) 
-             VALUES (?, ?, ?, ?, ?, ?)`,
-            [name, code.toUpperCase(), symbol, icon, display_order || 0, userId]
+            `INSERT INTO currencies (name, code, symbol, icon, display_order, country_code, created_by) 
+             VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [name, code.toUpperCase(), symbol, icon, display_order || 0, country_code || null, userId]
         );
         return result.insertId;
     }
@@ -52,21 +52,45 @@ class Currency {
     static async addRate(currencyId, sellRate, buyRate, userId) {
         const effectiveDate = new Date().toISOString().split('T')[0];
         
+        // Get currency info for history
+        const currency = await this.getById(currencyId);
+        
+        // Check if rate exists for today
         const [existing] = await pool.execute(
-            'SELECT id FROM exchange_rates WHERE currency_id = ? AND effective_date = ?',
+            'SELECT id, sell_rate, buy_rate FROM exchange_rates WHERE currency_id = ? AND effective_date = ?',
             [currencyId, effectiveDate]
         );
         
         let rateId;
+        
         if (existing.length > 0) {
+            // Get old rates for history
+            const oldSellRate = existing[0].sell_rate;
+            const oldBuyRate = existing[0].buy_rate;
+            
+            // Update existing rate
             await pool.execute(
                 `UPDATE exchange_rates 
                  SET sell_rate = ?, buy_rate = ?, updated_by = ?, updated_at = NOW()
                  WHERE id = ?`,
                 [sellRate, buyRate, userId, existing[0].id]
             );
+            
             rateId = existing[0].id;
+            
+            // Insert into history with old and new values
+            await pool.execute(
+                `INSERT INTO rate_history 
+                 (currency_id, currency_code, currency_name, 
+                  old_sell_rate, new_sell_rate, old_buy_rate, new_buy_rate, 
+                  effective_date, action_type, changed_by)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'update', ?)`,
+                [currencyId, currency.code, currency.name, 
+                 oldSellRate, sellRate, oldBuyRate, buyRate, 
+                 effectiveDate, userId]
+            );
         } else {
+            // Insert new rate
             const [result] = await pool.execute(
                 `INSERT INTO exchange_rates 
                  (currency_id, sell_rate, buy_rate, effective_date, created_by, updated_by)
@@ -74,19 +98,61 @@ class Currency {
                 [currencyId, sellRate, buyRate, effectiveDate, userId, userId]
             );
             rateId = result.insertId;
+            
+            // Insert into history for new rate
+            await pool.execute(
+                `INSERT INTO rate_history 
+                 (currency_id, currency_code, currency_name, 
+                  new_sell_rate, new_buy_rate, 
+                  effective_date, action_type, changed_by)
+                 VALUES (?, ?, ?, ?, ?, ?, 'create', ?)`,
+                [currencyId, currency.code, currency.name, 
+                 sellRate, buyRate, effectiveDate, userId]
+            );
         }
         
-        const currency = await this.getById(currencyId);
+        return rateId;
+    }
+
+    static async update(id, currencyData, userId) {
+        const { name, code, symbol, icon, display_order, is_active, country_code } = currencyData;
         
-        await pool.execute(
-            `INSERT INTO rate_history 
-             (currency_id, currency_code, currency_name, sell_rate, buy_rate, 
-              effective_date, action_type, changed_by)
-             VALUES (?, ?, ?, ?, ?, ?, 'update', ?)`,
-            [currencyId, currency.code, currency.name, sellRate, buyRate, effectiveDate, userId]
+        const [result] = await pool.execute(
+            `UPDATE currencies 
+             SET name = ?, code = ?, symbol = ?, icon = ?, 
+                 display_order = ?, is_active = ?, country_code = ?
+             WHERE id = ?`,
+            [name, code.toUpperCase(), symbol, icon, display_order, is_active, country_code, id]
         );
         
-        return rateId;
+        return result.affectedRows;
+    }
+
+    static async delete(id, userId) {
+        // Get currency info before deletion
+        const currency = await this.getById(id);
+        
+        // Get current rates
+        const [rates] = await pool.execute(
+            'SELECT sell_rate, buy_rate, effective_date FROM exchange_rates WHERE currency_id = ? AND status = "active"',
+            [id]
+        );
+        
+        // Soft delete - mark inactive
+        const [result] = await pool.execute('UPDATE currencies SET is_active = 0 WHERE id = ?', [id]);
+        
+        // Log deletion in history
+        if (rates.length > 0) {
+            await pool.execute(
+                `INSERT INTO rate_history 
+                 (currency_id, currency_code, currency_name, 
+                  old_sell_rate, old_buy_rate, effective_date, action_type, changed_by)
+                 VALUES (?, ?, ?, ?, ?, ?, 'delete', ?)`,
+                [id, currency.code, currency.name, rates[0].sell_rate, rates[0].buy_rate, rates[0].effective_date, userId]
+            );
+        }
+        
+        return result.affectedRows;
     }
 
     static async getRateHistory(currencyId = null, limit = 100) {
@@ -106,6 +172,19 @@ class Currency {
         params.push(limit);
         
         const [rows] = await pool.execute(query, params);
+        return rows;
+    }
+
+    static async getHistoricalRates(currencyId, days = 30) {
+        const [rows] = await pool.execute(
+            `SELECT er.*, u.username as updated_by_name
+             FROM exchange_rates er
+             LEFT JOIN users u ON er.updated_by = u.id
+             WHERE er.currency_id = ? 
+               AND er.effective_date >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
+             ORDER BY er.effective_date DESC`,
+            [currencyId, days]
+        );
         return rows;
     }
 }

@@ -53,22 +53,41 @@ class PendingChange {
         const pending = change[0];
         
         if (pending.change_type === 'add_currency') {
+            // Create new currency
             const currencyId = await Currency.create({
                 name: pending.currency_name,
                 code: pending.currency_code,
                 symbol: pending.currency_symbol,
-                icon: pending.currency_icon
+                icon: pending.currency_icon,
+                country_code: null
             }, approverId);
             
+            // Add the rate
             await Currency.addRate(currencyId, pending.sell_rate, pending.buy_rate, approverId);
             
         } else if (pending.change_type === 'update_rate' && pending.currency_id) {
+            // Update existing rate
             await Currency.addRate(pending.currency_id, pending.sell_rate, pending.buy_rate, approverId);
             
         } else if (pending.change_type === 'delete_currency' && pending.currency_id) {
-            await pool.execute('DELETE FROM currencies WHERE id = ?', [pending.currency_id]);
+            // Soft delete - mark as inactive
+            await pool.execute('UPDATE currencies SET is_active = 0 WHERE id = ?', [pending.currency_id]);
+            
+            // Also log deletion in history
+            const currency = await Currency.getById(pending.currency_id);
+            if (currency) {
+                await pool.execute(
+                    `INSERT INTO rate_history 
+                     (currency_id, currency_code, currency_name, 
+                      old_sell_rate, old_buy_rate, effective_date, action_type, changed_by)
+                     VALUES (?, ?, ?, ?, ?, CURDATE(), 'delete', ?)`,
+                    [pending.currency_id, currency.code, currency.name, 
+                     currency.sell_rate, currency.buy_rate, approverId]
+                );
+            }
         }
         
+        // Update pending status
         const [result] = await pool.execute(
             `UPDATE pending_changes 
              SET approval_status = 'approved', approved_by = ?, updated_at = NOW()
