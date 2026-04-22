@@ -7,10 +7,12 @@
     font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
 }
 
+
+
 /* Top Navigation Bar - Blue Brand */
 .admin-top-bar {
-    background: linear-gradient(135deg, #003366 0%, #001f3f 100%);
-    color: white;
+    background: linear-gradient(135deg, #2d05e1 0%, #2563eb 100%);
+    color: #ffffff;
     padding: 0.75rem 1.5rem;
     display: flex;
     justify-content: space-between;
@@ -53,6 +55,11 @@
 .admin-logo i {
     font-size: 1.8rem;
     color: white;
+}
+.logo-subtitle{
+    font-size: 0.75rem;
+    opacity: 0.8;
+    color:white
 }
 
 .logo-text {

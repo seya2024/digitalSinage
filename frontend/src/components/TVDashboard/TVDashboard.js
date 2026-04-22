@@ -264,7 +264,7 @@ const TVDashboard = () => {
                             <i className="fas fa-landmark"></i>
                         </div>
                     </div>
-                    <h2>DASHEN BANK</h2>
+                    <h2> ዳሽን ባንክ አ.ማ </h2>
                     <div className="loading-bar">
                         <div className="loading-bar-fill"></div>
                     </div>
@@ -288,13 +288,13 @@ const TVDashboard = () => {
             <header className="tv-header">
                 <div className="header-left">
                     <div className="bank-logo">
-                        {/* <div className="logo-icon">
-                            <i className="fas fa-landmark"></i>
-                        </div> */}
-
                         <div className="logo-icon">
-                            <img src="/images/logo.jpg"  alt="Dashen Bank"  className="logo-image"/>
+                            <i className="fas fa-landmark"></i>
                         </div>
+
+                        {/* <div className="logo-icon">
+                            <img src="/images/logo.jpg"  alt="Dashen Bank"  className="logo-image"/>
+                        </div> */}
 
                         <div className="logo-text">
                             <h1>ዳሽን ባንክ አ.ማ</h1>
