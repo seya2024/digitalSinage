@@ -107,52 +107,78 @@ class Video {
             console.log('📹 Updating video:', id);
             console.log('📝 Update data:', JSON.stringify(videoData, null, 2));
             
-            const { 
-                title, 
-                description, 
-                video_url, 
-                video_type, 
-                thumbnail_url,
-                duration, 
-                status, 
-                display_order, 
-                start_date, 
-                end_date,
-                file_path
-            } = videoData;
+            // Build dynamic update query based on what fields are provided
+            const updates = [];
+            const values = [];
             
-            const [result] = await pool.execute(
-                `UPDATE videos 
-                 SET title = ?, 
-                     description = ?, 
-                     video_url = ?, 
-                     video_type = ?,
-                     thumbnail_url = ?,
-                     duration = ?, 
-                     status = ?, 
-                     display_order = ?,
-                     start_date = ?,
-                     end_date = ?,
-                     file_path = ?,
-                     updated_at = NOW()
-                 WHERE id = ?`,
-                [
-                    title, 
-                    description || null, 
-                    video_url || null, 
-                    video_type, 
-                    thumbnail_url || null,
-                    duration ? parseInt(duration) : null, 
-                    status, 
-                    display_order ? parseInt(display_order) : 0,
-                    start_date || null,
-                    end_date || null,
-                    file_path || null,
-                    id
-                ]
-            );
+            // Only add fields that are actually provided (not undefined)
+            if (videoData.title !== undefined) {
+                updates.push('title = ?');
+                values.push(videoData.title);
+            }
+            if (videoData.description !== undefined) {
+                updates.push('description = ?');
+                values.push(videoData.description || null);
+            }
+            if (videoData.video_url !== undefined) {
+                updates.push('video_url = ?');
+                values.push(videoData.video_url || null);
+            }
+            if (videoData.video_type !== undefined) {
+                updates.push('video_type = ?');
+                values.push(videoData.video_type);
+            }
+            if (videoData.thumbnail_url !== undefined) {
+                updates.push('thumbnail_url = ?');
+                values.push(videoData.thumbnail_url || null);
+            }
+            if (videoData.duration !== undefined) {
+                updates.push('duration = ?');
+                values.push(videoData.duration ? parseInt(videoData.duration) : null);
+            }
+            if (videoData.status !== undefined) {
+                updates.push('status = ?');
+                values.push(videoData.status);
+                console.log('📹 Updating status to:', videoData.status);
+            }
+            if (videoData.display_order !== undefined) {
+                updates.push('display_order = ?');
+                values.push(videoData.display_order ? parseInt(videoData.display_order) : 0);
+            }
+            if (videoData.start_date !== undefined) {
+                updates.push('start_date = ?');
+                values.push(videoData.start_date || null);
+            }
+            if (videoData.end_date !== undefined) {
+                updates.push('end_date = ?');
+                values.push(videoData.end_date || null);
+            }
+            if (videoData.file_path !== undefined) {
+                updates.push('file_path = ?');
+                values.push(videoData.file_path || null);
+            }
             
+            // Always update the timestamp
+            updates.push('updated_at = NOW()');
+            
+            // Check if there's anything to update
+            if (updates.length === 1) {
+                console.log('⚠️ No fields to update');
+                return 0;
+            }
+            
+            // Add the ID to values array
+            values.push(id);
+            
+            // Build and execute query
+            const query = `UPDATE videos SET ${updates.join(', ')} WHERE id = ?`;
+            
+            console.log('📹 Update query:', query);
+            console.log('📹 Update values:', values);
+            
+            const [result] = await pool.execute(query, values);
             console.log('✅ Video updated, affected rows:', result.affectedRows);
+            
             return result.affectedRows;
             
         } catch (error) {
