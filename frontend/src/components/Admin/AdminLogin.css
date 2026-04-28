@@ -112,7 +112,7 @@
 .input-group label {
     display: block;
     margin-bottom: 8px;
-    color: #333;
+    color: #0733f6;
     font-weight: 600;
     font-size: 0.85rem;
     text-transform: uppercase;
@@ -123,6 +123,7 @@
 .input-wrapper {
     position: relative;
     width: 100%;
+    color:blue
 }
 
 /* FIXED: Icon positioning - doesn't affect input width */
@@ -143,7 +144,7 @@
     right: 15px;
     top: 50%;
     transform: translateY(-50%);
-    background: none;
+    background: white;
     border: none;
     color: #999;
     cursor: pointer;
@@ -154,7 +155,7 @@
 }
 
 .password-toggle:hover {
-    color: #002B5C;
+    color: #0674f1;
 }
 
 /* FIXED: Input field - Proper padding to prevent overflow */

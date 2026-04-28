@@ -243,12 +243,12 @@ const TVDashboard = () => {
 /* ─── Footer Messages for Scrolling Ticker (Only Two Messages) ─── */
 /* ─── Footer Messages - Repeated for Smooth Continuous Scroll ─── */
 const footerMessages = useMemo(() => [
-    { icon: 'fa-hand-peace', text: 'አንኳን ወደ ዳሻን ባንክ በደህና መጡ። — ሁልጊዜም አንድ እርምጃ ቀዳሚ!' },
-    { icon: 'fa-hand-peace', text: 'Welcome to Dashen Bank — Dashen Bank always One Step ahead' },
-    { icon: 'fa-hand-peace', text: 'አንኳን ወደ ዳሻን ባንክ በደህና መጡ። — ሁልጊዜም አንድ እርምጃ ቀዳሚ!' },
-    { icon: 'fa-hand-peace', text: 'Welcome to Dashen Bank — Dashen Bank always One Step ahead' },
-    { icon: 'fa-hand-peace', text: 'አንኳን ወደ ዳሻን ባንክ በደህና መጡ። — ሁልጊዜም አንድ እርምጃ ቀዳሚ!' },
-    { icon: 'fa-hand-peace', text: 'Welcome to Dashen Bank — Dashen Bank always One Step ahead' },
+    { text: 'አንኳን ወደ ዳሻን ባንክ በደህና መጡ። — ዳሻን ባንክ ሁልጊዜም አንድ እርምጃ ቀዳሚ!' },
+    {  text: 'Welcome to Dashen Bank — Dashen Bank always One Step ahead' },
+    {  text: 'አንኳን ወደ ዳሻን ባንክ በደህና መጡ። — ዳሻን ባንክ ሁልጊዜም አንድ እርምጃ ቀዳሚ!' },
+    {  text: 'Welcome to Dashen Bank — Dashen Bank always One Step ahead' },
+    {  text: 'አንኳን ወደ ዳሻን ባንክ በደህና መጡ። — ሁልጊዜም አንድ እርምጃ ቀዳሚ!' },
+    {  text: 'Welcome to Dashen Bank — Dashen Bank always One Step ahead' },
 ], []);
 
     /* ─── Loading State ─── */
@@ -321,7 +321,7 @@ const footerMessages = useMemo(() => [
             <div className="dt-day">{dayName}</div>
             <div className="dt-dates-container">
                 <div className="dt-date-gregorian">
-                    <i className="fas fa-calendar-alt"></i>
+                    {/* <i className="fas fa-calendar-alt"></i> */}
                     <span>{date}</span>
                 </div>
               
@@ -556,7 +556,7 @@ const footerMessages = useMemo(() => [
     {/* <div className="dt-day">{dayName}</div> */}
     <div className="dt-dates">
         <span className="gregorian-date">📅 12/06/2026 G.C </span>
-        <span className="ethiopian-date"> - 20/02/2018 ዓ.ም</span>
+        <span className="ethiopian-date"> | 20/02/2018 ዓ.ም</span>
     </div>
     
 </div>
