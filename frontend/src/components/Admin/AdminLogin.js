@@ -38,17 +38,15 @@ const AdminLogin = () => {
             <div className="admin-login-card">
                 <div className="login-header">
                     <div className="logo-icon">
-                        <img 
-                            src="/images/logo.jpg" 
-                            alt="Dashen Bank" 
-                            className="logo-image"
+                        <img src="/images/logo.png" alt="Dashen Bank"  className="logo-image"
+                              
                             onError={(e) => {
                                 e.target.onerror = null;
                                 e.target.src = "https://via.placeholder.com/80x80?text=DB";
                             }}
                         />
                     </div>
-                    <h2>ዳሽን ባንክ</h2>
+                    {/* <h2>ዳሽን ባንክ</h2> */}
                     <p>ዕለታዊ የውጭ ምንዛሪ ገበያ ተመኖች</p>
                     <small>Exchange Rate Management System</small>
                 </div>
