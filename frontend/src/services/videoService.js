@@ -17,7 +17,7 @@ export const videoService = {
         return response.data;
     },
     
-    // Create video with file upload (for local videos)
+    // Create video with file upload (for local videosa)
     createWithFile: async (formData) => {
         const response = await api.post('/videos', formData, {
             headers: { 

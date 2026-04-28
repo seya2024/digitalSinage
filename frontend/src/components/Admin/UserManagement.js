@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { userService } from '../../services/userService';
 import { useAuth } from '../../context/AuthContext';
+import ConfirmModal from '../common/ConfirmModal';
 import './UserManagement.css';
 
 const UserManagement = () => {
@@ -10,13 +11,24 @@ const UserManagement = () => {
     const [editingUser, setEditingUser] = useState(null);
     const [message, setMessage] = useState({ type: '', text: '' });
     const [searchTerm, setSearchTerm] = useState('');
+    const [confirmModal, setConfirmModal] = useState({
+        isOpen: false,
+        type: '',
+        userId: null,
+        userName: '',
+        title: '',
+        message: '',
+        confirmText: '',
+        confirmVariant: '',
+        icon: ''
+    });
     const { user: currentUser } = useAuth();
     
     const [newUser, setNewUser] = useState({
         username: '',
         password: '',
         email: '',
-        role: 'admin'
+        role: 'ibd'  // Default to IBD for new users
     });
 
     useEffect(() => {
@@ -46,17 +58,27 @@ const UserManagement = () => {
     };
 
     const handleAddUser = async () => {
-        if (!newUser.username || !newUser.password || !newUser.email) {
-            showMessage('error', 'Please fill all required fields');
+        if (!newUser.username || !newUser.password) {
+            showMessage('error', 'Username and password are required');
+            return;
+        }
+
+        if (newUser.username.length < 3) {
+            showMessage('error', 'Username must be at least 3 characters');
+            return;
+        }
+
+        if (newUser.password.length < 6) {
+            showMessage('error', 'Password must be at least 6 characters');
             return;
         }
 
         try {
-            const response = await userService.create(newUser);
+            const response = await userService.register(newUser);
             if (response.success) {
-                showMessage('success', 'User created successfully');
+                showMessage('success', `User ${newUser.username} created successfully`);
                 setShowAddForm(false);
-                setNewUser({ username: '', password: '', email: '', role: 'admin' });
+                setNewUser({ username: '', password: '', email: '', role: 'ibd' });
                 loadUsers();
             } else {
                 showMessage('error', response.message || 'Failed to create user');
@@ -73,6 +95,18 @@ const UserManagement = () => {
         }
 
         try {
+            // Use updateRole if only role is changing
+            if (editingUser.role !== undefined) {
+                const response = await userService.updateRole(editingUser.id, editingUser.role);
+                if (response.success) {
+                    showMessage('success', 'User role updated successfully');
+                    setEditingUser(null);
+                    loadUsers();
+                    return;
+                }
+            }
+            
+            // Full update for other fields
             const updateData = {
                 username: editingUser.username,
                 email: editingUser.email,
@@ -93,24 +127,45 @@ const UserManagement = () => {
         }
     };
 
-    const handleDeleteUser = async (userId, username) => {
+    const handleDeleteClick = (userId, username) => {
         if (userId === currentUser?.id) {
             showMessage('error', 'You cannot delete your own account');
             return;
         }
         
-        if (window.confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) {
-            try {
-                const response = await userService.delete(userId);
-                if (response.success) {
-                    showMessage('success', 'User deleted successfully');
-                    loadUsers();
-                } else {
-                    showMessage('error', response.message || 'Failed to delete user');
-                }
-            } catch (error) {
-                showMessage('error', error.response?.data?.message || 'Failed to delete user');
+        // Prevent deleting the main admin account
+        if (username === 'admin') {
+            showMessage('error', 'Cannot delete the main admin account');
+            return;
+        }
+        
+        setConfirmModal({
+            isOpen: true,
+            type: 'delete',
+            userId: userId,
+            userName: username,
+            title: 'Delete User',
+            message: `Are you sure you want to delete user "${username}"? This action cannot be undone.`,
+            confirmText: 'Yes, Delete',
+            confirmVariant: 'danger',
+            icon: 'trash-alt'
+        });
+    };
+
+    const handleDeleteUser = async () => {
+        const { userId, userName } = confirmModal;
+        try {
+            const response = await userService.delete(userId);
+            if (response.success) {
+                showMessage('success', `User "${userName}" deleted successfully`);
+                loadUsers();
+            } else {
+                showMessage('error', response.message || 'Failed to delete user');
             }
+        } catch (error) {
+            showMessage('error', error.response?.data?.message || 'Failed to delete user');
+        } finally {
+            setConfirmModal({ ...confirmModal, isOpen: false });
         }
     };
 
@@ -129,6 +184,12 @@ const UserManagement = () => {
         }
     };
 
+    const handleConfirmAction = () => {
+        if (confirmModal.type === 'delete') {
+            handleDeleteUser();
+        }
+    };
+
     const filteredUsers = users.filter(user => 
         user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -140,6 +201,8 @@ const UserManagement = () => {
                 return 'role-badge super-admin';
             case 'admin':
                 return 'role-badge admin';
+            case 'ibd':
+                return 'role-badge ibd';
             default:
                 return 'role-badge user';
         }
@@ -151,6 +214,8 @@ const UserManagement = () => {
                 return 'fa-crown';
             case 'admin':
                 return 'fa-user-shield';
+            case 'ibd':
+                return 'fa-globe';
             default:
                 return 'fa-user';
         }
@@ -162,6 +227,8 @@ const UserManagement = () => {
                 return 'Super Admin';
             case 'admin':
                 return 'Admin';
+            case 'ibd':
+                return 'IBD';
             default:
                 return 'User';
         }
@@ -264,7 +331,7 @@ const UserManagement = () => {
                                     </label>
                                     <input
                                         type="password"
-                                        placeholder="Enter password"
+                                        placeholder="Enter password (min 6 characters)"
                                         value={newUser.password}
                                         onChange={(e) => setNewUser({...newUser, password: e.target.value})}
                                     />
@@ -274,7 +341,7 @@ const UserManagement = () => {
                                 <div className="form-group">
                                     <label>
                                         <i className="fas fa-envelope"></i>
-                                        Email <span className="required">*</span>
+                                        Email
                                     </label>
                                     <input
                                         type="email"
@@ -292,9 +359,16 @@ const UserManagement = () => {
                                         value={newUser.role}
                                         onChange={(e) => setNewUser({...newUser, role: e.target.value})}
                                     >
-                                        <option value="admin">Admin</option>
-                                        <option value="super_admin">Super Admin</option>
+                                        <option value="ibd">
+                                            <i className="fas fa-globe"></i> IBD (International Banking Dept)
+                                        </option>
+                                        <option value="admin">
+                                            <i className="fas fa-user-shield"></i> Admin
+                                        </option>
                                     </select>
+                                    <small className="field-hint">
+                                        IBD: Can add currencies and update exchange rates | Admin: IBD + Video management
+                                    </small>
                                 </div>
                             </div>
                         </div>
@@ -361,11 +435,15 @@ const UserManagement = () => {
                                         onChange={(e) => setEditingUser({...editingUser, role: e.target.value})}
                                         disabled={editingUser.id === currentUser?.id && currentUser?.role === 'super_admin'}
                                     >
+                                        <option value="ibd">IBD (International Banking Dept)</option>
                                         <option value="admin">Admin</option>
                                         <option value="super_admin">Super Admin</option>
                                     </select>
                                     {editingUser.id === currentUser?.id && (
                                         <small className="field-note">You cannot change your own role</small>
+                                    )}
+                                    {editingUser.username === 'admin' && editingUser.role === 'super_admin' && (
+                                        <small className="field-note warning">Main admin account role cannot be changed</small>
                                     )}
                                 </div>
                                 <div className="form-group checkbox-group">
@@ -421,7 +499,6 @@ const UserManagement = () => {
                                 <th>Role</th>
                                 <th>Status</th>
                                 <th>Last Login</th>
-                                {/* <th>Created</th> */}
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -447,7 +524,7 @@ const UserManagement = () => {
                                     <td className="email-cell">
                                         <a href={`mailto:${user.email}`} className="email-link">
                                             <i className="fas fa-envelope"></i>
-                                            {user.email}
+                                            {user.email || '—'}
                                         </a>
                                     </td>
                                     <td>
@@ -472,10 +549,6 @@ const UserManagement = () => {
                                             <span className="never-logged">Never</span>
                                         )}
                                     </td>
-                                    {/* <td className="date-cell">
-                                        <i className="fas fa-calendar-alt"></i>
-                                        {new Date(user.created_at).toLocaleDateString()}
-                                    </td> */}
                                     <td className="actions-cell">
                                         <div className="action-buttons">
                                             <button 
@@ -484,7 +557,6 @@ const UserManagement = () => {
                                                 title="Edit user"
                                             >
                                                 <i className="fas fa-edit"></i>
-                                                Edit
                                             </button>
                                             <button 
                                                 onClick={() => handleResetPassword(user.id, user.username)} 
@@ -492,16 +564,14 @@ const UserManagement = () => {
                                                 title="Reset password"
                                             >
                                                 <i className="fas fa-key"></i>
-                                                Reset
                                             </button>
                                             <button 
-                                                onClick={() => handleDeleteUser(user.id, user.username)} 
+                                                onClick={() => handleDeleteClick(user.id, user.username)} 
                                                 className="action-btn delete-btn"
                                                 title="Delete user"
-                                                disabled={user.id === currentUser?.id}
+                                                disabled={user.id === currentUser?.id || user.username === 'admin'}
                                             >
                                                 <i className="fas fa-trash-alt"></i>
-                                                Delete
                                             </button>
                                         </div>
                                     </td>
@@ -522,27 +592,40 @@ const UserManagement = () => {
                     </div>
                 </div>
                 <div className="stat-item">
+                    <i className="fas fa-globe"></i>
+                    <div className="stat-details">
+                        <span className="stat-value">{users.filter(u => u.role === 'ibd').length}</span>
+                        <span className="stat-label">IBD Users</span>
+                    </div>
+                </div>
+                <div className="stat-item">
                     <i className="fas fa-user-shield"></i>
+                    <div className="stat-details">
+                        <span className="stat-value">{users.filter(u => u.role === 'admin').length}</span>
+                        <span className="stat-label">Admins</span>
+                    </div>
+                </div>
+                <div className="stat-item">
+                    <i className="fas fa-crown"></i>
                     <div className="stat-details">
                         <span className="stat-value">{users.filter(u => u.role === 'super_admin').length}</span>
                         <span className="stat-label">Super Admins</span>
                     </div>
                 </div>
-                <div className="stat-item">
-                    <i className="fas fa-user-check"></i>
-                    <div className="stat-details">
-                        <span className="stat-value">{users.filter(u => u.is_active).length}</span>
-                        <span className="stat-label">Active Users</span>
-                    </div>
-                </div>
-                <div className="stat-item">
-                    <i className="fas fa-chart-line"></i>
-                    <div className="stat-details">
-                        <span className="stat-value">{filteredUsers.length}</span>
-                        <span className="stat-label">Showing Results</span>
-                    </div>
-                </div>
             </div>
+
+            {/* Confirm Modal */}
+            <ConfirmModal
+                isOpen={confirmModal.isOpen}
+                onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+                onConfirm={handleConfirmAction}
+                title={confirmModal.title}
+                message={confirmModal.message}
+                confirmText={confirmModal.confirmText}
+                cancelText="Cancel"
+                confirmVariant={confirmModal.confirmVariant}
+                icon={confirmModal.icon}
+            />
         </div>
     );
 };

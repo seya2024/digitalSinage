@@ -25,6 +25,7 @@ const protect = async (req, res, next) => {
     }
 };
 
+// Super Admin only (full access, can approve/reject changes)
 const superAdminOnly = (req, res, next) => {
     if (req.user && req.user.role === 'super_admin') {
         next();
@@ -33,4 +34,23 @@ const superAdminOnly = (req, res, next) => {
     }
 };
 
-module.exports = { protect, superAdminOnly };
+// Admin only (regular admin or super admin)
+const adminOnly = (req, res, next) => {
+    if (req.user && (req.user.role === 'admin' || req.user.role === 'super_admin')) {
+        next();
+    } else {
+        res.status(403).json({ success: false, message: 'Not authorized as admin' });
+    }
+};
+
+// IBD or higher (IBD, Admin, Super Admin)
+// IBD can add currencies and update exchange rates
+const ibdOrHigher = (req, res, next) => {
+    if (req.user && (req.user.role === 'ibd' || req.user.role === 'admin' || req.user.role === 'super_admin')) {
+        next();
+    } else {
+        res.status(403).json({ success: false, message: 'Not authorized. IBD role or higher required.' });
+    }
+};
+
+module.exports = { protect, superAdminOnly, adminOnly, ibdOrHigher };

@@ -78,18 +78,88 @@
     display: flex; align-items: center; justify-content: space-between;
     padding: 12px 28px;
     color:white;
-    background: linear-gradient(180deg, rgba(13, 93, 214, 0.96), rgba(23, 89, 187, 0.7));
-    border-bottom: 1px solid var(--border-glass);
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    background:  linear-gradient(180deg, rgba(13, 93, 214, 0.96), rgba(7, 2, 27, 0.7));
+    border-bottom: 1px solid rgb(255, 255, 255);
+    backdrop-filter: blur(20px);
     flex-shrink: 0;
 }
 .header-left { display: flex; align-items: center; gap: 24px; }
-.bank-logo { display: flex; align-items: center; gap: 14px; }
-.logo-icon { width: 50px; height: 50px; border-radius: var(--radius-md); background: linear-gradient(135deg, var(--blue-500), var(--blue-300)); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 24px rgba(30,80,145,0.5); }
-.logo-icon i { font-size: 24px; color: #fff; }
-.logo-text h1 { font-size: 24px; font-weight: 800; letter-spacing: 4px; background: linear-gradient(135deg, #fff 20%, var(--blue-100)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2; }
-.logo-subtitle { font-size: 10px; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; font-weight: 600; }
-.header-badge { display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: rgba(212,168,67,0.07); border: 1px solid rgba(212,168,67,0.18); border-radius: var(--radius-lg); }
+
+
+/* LOGO - COMPLETELY SQUARE/RECTANGULAR - NO CIRCLE */
+.bank-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: transparent;
+}
+
+.logo-icon {
+    width: auto;
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    overflow: visible;
+}
+
+.logo-image {
+    height: 100%;
+    width: auto;
+    background: transparent !important;
+    border-radius: 0 !important;
+    object-fit: contain;
+    display: block;
+}
+
+/* Remove any pseudo-elements that might create circles */
+.logo-icon::before,
+.logo-icon::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* Logo Text Styles */
+.logo-text h1 {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #fff 20%, var(--blue-100));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+    margin: 0;
+    display: inline-block;
+}
+
+.logo-text h1 .bank-small {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    background: linear-gradient(135deg, var(--gold-400), #fff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.logo-subtitle {
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 600;
+    display: block;
+    margin-top: 2px;
+}
+
+.header-badge { display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: rgba(212,168,67,0.07); border: 1px solid rgba(243, 228, 228, 0.758); border-radius: var(--radius-lg); }
 .badge-eth { font-size: 15px; font-weight: 800; color: var(--gold-400); letter-spacing: 1px; }
 .badge-label { font-size: 11px; color: var(--gold-400); opacity: 0.6; }
 .header-right { display: flex; align-items: center; gap: 18px; }
@@ -242,7 +312,7 @@
     border: 1px solid var(--border-glass);
     border-radius: var(--radius-lg);
     padding: 18px 20px;
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
     transition: all 0.3s ease;
     position: relative; overflow: hidden;
 }
@@ -288,72 +358,553 @@
 .empty-fullscreen p { font-size: 18px; color: var(--text-muted); }
 .empty-fullscreen small { font-size: 13px; color: var(--text-muted); opacity: 0.6; }
 
-/* ─── Footer Ticker ─── */
-.tv-footer { position: relative; z-index: 10; display: flex; align-items: center; height: 36px; background: linear-gradient(180deg, rgba(6,14,26,0.85), rgba(6,14,26,0.96)); border-top: 1px solid var(--border-glass); flex-shrink: 0; overflow: hidden; }
-.footer-left { width: 130px; flex-shrink: 0; padding: 0 16px; border-right: 1px solid var(--border-glass); }
-.footer-brand { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--blue-300); white-space: nowrap; }
-.footer-brand i { font-size: 12px; color: var(--gold-400); }
-.ticker-track { flex: 1; overflow: hidden; }
-.ticker-content { display: flex; gap: 60px; animation: tScroll 45s linear infinite; white-space: nowrap; align-items: center; }
-.ticker-item { font-size: 12px; color: var(--text-secondary); font-weight: 500; flex-shrink: 0; }
-@keyframes tScroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-.footer-right { width: 60px; flex-shrink: 0; padding: 0 16px; border-left: 1px solid var(--border-glass); text-align: right; }
-.footer-version { font-size: 10px; color: var(--text-muted); opacity: 0.4; font-weight: 600; }
+/* ═══════════════════════════════════════════════════════════
+   FOOTER — Blue Background with SCROLLING Text (Slower Speed)
+   ═══════════════════════════════════════════════════════════ */
+.tv-footer {
+    background: linear-gradient(135deg, #0a2540 0%, #0d2f4d 100%);
+    backdrop-filter: blur(12px);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgb(247, 243, 243);
+    position: relative;
+    z-index: 100;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    min-height: 110px;
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
+}
 
-/* ─── Responsive ─── */
-@media (max-width: 1200px) {
-    .grid-cards { grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); }
-    .header-badge { display: none; }
+/* Footer Left Section */
+.footer-left {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
 }
-@media (max-width: 900px) {
-    .tv-split-layout { flex-direction: column; }
-    .tv-video-panel { width: 100%; height: 40%; border-right: none; border-bottom: 1px solid var(--border-glass); }
-    .tv-rates-panel { width: 100%; height: 60%; }
-    .logo-subtitle { display: none; }
-    .grid-cards { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
-    .flag-box { font-size: 28px; width: 42px; height: 42px; }
-    .currency-name-cell { font-size: 15px; }
-    .rate-val { font-size: 17px; }
+
+.brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0.8rem 1.8rem;
+    border-radius: 50px;
+    transition: all 0.2s ease;
 }
+
+.brand-logo i {
+    font-size: 1.6rem;
+    color: white;
+}
+
+.brand-name {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: white;
+    letter-spacing: 1px;
+}
+
+.brand-name span {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.8);
+    margin-left: 8px;
+}
+
+.footer-contact {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 0.8rem 1.8rem;
+    border-radius: 50px;
+    transition: all 0.2s ease;
+}
+
+.footer-contact i {
+    color: #4ade80;
+    font-size: 1.3rem;
+}
+
+.footer-contact span {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: white;
+}
+
+/* Footer Center Section - SCROLLING TEXT */
+.footer-center {
+    flex: 1;
+    overflow: hidden;
+    max-width: 55%;
+    text-align: center;
+}
+
+/* Welcome Banner - Amharic Message (Static) */
+.welcome-banner {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+    padding: 0.8rem 1rem;
+    margin-bottom: 0.8rem;
+    border-radius: 50px;
+}
+
+.welcome-text-amharic {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    flex-wrap: wrap;
+}
+
+.welcome-text-amharic i {
+    color: #f5b642;
+    font-size: 1.3rem;
+}
+
+.welcome-text-amharic span {
+    color: white;
+    letter-spacing: 0.5px;
+}
+
+.welcome-text-amharic strong {
+    color: #f5b642;
+    font-weight: 800;
+    font-size: 1.3rem;
+}
+
+.welcome-emoji {
+    font-size: 1.4rem;
+    animation: wave 1.5s ease-in-out infinite;
+}
+
+@keyframes wave {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(15deg); }
+    75% { transform: rotate(-5deg); }
+}
+
+/* SCROLLING TICKER - SLOWER SPEED (90 seconds) */
+.ticker-track {
+    overflow: hidden;
+    white-space: nowrap;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50px;
+    padding: 0.8rem 0;
+    margin-top: 0.3rem;
+}
+
+.ticker-content {
+    display: inline-block;
+    animation: tickerScroll 90s linear infinite;
+    white-space: nowrap;
+}
+
+.ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    margin-right: 3.5rem;
+}
+
+.ticker-item i {
+    font-size: 1.2rem;
+    color: #f5b642;
+}
+
+.ticker-separator {
+    color: #f5b642;
+    margin-right: 1rem;
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+
+@keyframes tickerScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+.ticker-track:hover .ticker-content {
+    animation-play-state: paused;
+}
+
+/* Footer Right Section */
+.footer-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.footer-status {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 0.7rem 1.5rem;
+    border-radius: 50px;
+}
+
+.status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.status-dot.live {
+    background-color: #4ade80;
+    box-shadow: 0 0 12px rgba(74, 222, 128, 0.6);
+    animation: pulse-green 1.5s infinite;
+}
+
+.status-dot.connecting {
+    background-color: #fbbf24;
+    animation: pulse-yellow 1.5s infinite;
+}
+
+@keyframes pulse-green {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+@keyframes pulse-yellow {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+.status-text {
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 1px;
+}
+
+.footer-version {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.7rem 1.5rem;
+    border-radius: 50px;
+}
+
+.footer-version i {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.footer-version span {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: monospace;
+}
+
+.footer-divider {
+    width: 1px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Hover Effects */
+.brand-logo:hover,
+.footer-contact:hover,
+.footer-status:hover,
+.footer-version:hover {
+    transform: translateY(-2px);
+    transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.brand-logo i {
+    transition: transform 0.2s ease;
+}
+
+.brand-logo:hover i {
+    transform: scale(1.05);
+}
+
+/* Responsive Footer */
+@media (max-width: 1024px) {
+    .tv-footer {
+        flex-direction: column;
+        padding: 1rem;
+        gap: 1rem;
+        min-height: auto;
+    }
+    
+    .footer-center {
+        max-width: 100%;
+        width: 100%;
+        order: 2;
+    }
+    
+    .footer-left {
+        order: 1;
+        justify-content: center;
+        width: 100%;
+        flex-wrap: wrap;
+    }
+    
+    .footer-right {
+        order: 3;
+        justify-content: center;
+        width: 100%;
+        flex-wrap: wrap;
+    }
+    
+    .footer-divider {
+        display: none;
+    }
+    
+    .welcome-text-amharic {
+        font-size: 1rem;
+    }
+    
+    .ticker-item {
+        font-size: 0.9rem;
+        margin-right: 2rem;
+    }
+}
+
 @media (max-width: 600px) {
-    .tv-header { padding: 10px 14px; }
-    .logo-icon { width: 38px; height: 38px; }
-    .logo-icon i { font-size: 18px; }
-    .logo-text h1 { font-size: 17px; letter-spacing: 2px; }
-    .dt-time { font-size: 18px; }
-    .grid-cards { grid-template-columns: 1fr; }
-    .flag-box { font-size: 24px; width: 38px; height: 38px; border-radius: 8px; }
-    .currency-name-cell { font-size: 14px; }
-    .grid-flag-box { font-size: 32px; width: 46px; height: 46px; }
-    .grid-cur-name { font-size: 15px; }
-}
-@media (prefers-reduced-motion: reduce) {
-    .bg-orb, .ticker-content, .loading-icon-ring::before, .time-pulse, .live-dot { animation: none !important; }
-    .grid-card:hover { transform: none; }
-}
-
-.bank-logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
-}
-
-.logo-image {
-  height: 48px;
-  width: auto;
-  display: block;
-}
-
-.logo-text h1 {
-  font-size: 1.2rem;
-  margin: 0;
-  font-weight: 600;
-  color: #002B5C; /* dark blue */
+    .brand-name {
+        font-size: 1rem;
+    }
+    
+    .brand-name span {
+        font-size: 0.75rem;
+    }
+    
+    .welcome-text-amharic {
+        font-size: 0.85rem;
+        gap: 0.5rem;
+    }
+    
+    .welcome-text-amharic strong {
+        font-size: 0.9rem;
+    }
+    
+    .ticker-item {
+        font-size: 0.8rem;
+        gap: 0.5rem;
+        margin-right: 1.5rem;
+    }
+    
+    .ticker-item i {
+        font-size: 0.9rem;
+    }
+    
+    .footer-contact span {
+        font-size: 1rem;
+    }
 }
 
-.logo-subtitle {
-  font-size: 0.7rem;
-  color: #555;
-  letter-spacing: 0.3px;
+/* ═══════════════════════════════════════════════════════════
+   RATES TABLE — Built for TV viewing distance (UPDATED: White, Bold, Larger Font)
+   ═══════════════════════════════════════════════════════════ */
+.rates-table-wrapper { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+.rates-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.rates-table thead { position: sticky; top: 0; z-index: 2; }
+.rates-table thead tr { background: linear-gradient(180deg, rgba(17,42,79,0.95), rgba(17,42,79,0.7)); }
+
+/* TABLE HEADERS - WHITE, BOLD, LARGER FONT */
+.rates-table th { 
+    padding: 15px 16px; 
+    text-align: left; 
+    font-size: 16px;        /* Increased from 11px */
+    font-weight: 800;       /* Extra bold */
+    text-transform: uppercase; 
+    letter-spacing: 2px; 
+    color: #ffffff;         /* WHITE color */
+    
+    border-bottom: 2px solid rgba(245, 182, 66, 0.3);
 }
+
+.th-currency { width: 44% !important; }
+.th-code { width: 12% !important; text-align: center !important; }
+.th-buy { width: 22% !important; text-align: right !important; }
+.th-sell { width: 22% !important; text-align: right !important; }
+
+.rates-table-body { flex: 1; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
+.rates-table-body::-webkit-scrollbar { display: none; }
+
+.rate-row { transition: background 0.2s ease; border-bottom: 1px solid rgba(42,108,184,0.06); }
+.rate-row:nth-child(even) { background: rgba(13,31,60,0.25); }
+.rate-row:hover { background: rgba(42,108,184,0.12); }
+.rate-row td { padding: 10px 16px; vertical-align: middle; }
+
+/* ── FLAG BOX ── */
+.td-currency {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    padding-left: 16px !important;
+}
+
+.flag-box {
+    font-size: 34px;
+    line-height: 1;
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.03);
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.06);
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.35));
+}
+
+/* ── CURRENCY NAME: bold white, larger ── */
+.currency-name-cell {
+    font-size: 18px;        /* Increased from 17px */
+    font-weight: 800;       /* Extra bold */
+    color: #ffffff;
+        /* color: var(--gold-400);       */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.3px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+
+/* ── CODE BADGE: white, bold ── */
+.td-code { text-align: center !important; }
+.code-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, rgba(42,108,184,0.18), rgba(42,108,184,0.06));
+    border: 1px solid rgba(42,108,184,0.28);
+    border-radius: var(--radius-sm);
+    font-size: 15px;        /* Increased from 14px */
+    font-weight: 800;
+    color: #ffffff;     /* White */
+    /* color: var(--gold-400);       */
+    letter-spacing: 2px;
+}
+
+/* ── BUY / SELL values: larger, bold ── */
+.td-buy { text-align: right !important; }
+.td-sell { text-align: right !important; }
+.rate-val { 
+    font-size: 22px;        /* Increased from 20px */
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.3px;
+}
+.rate-buy { color: var(--green-400); }
+.rate-sell { color: var(--red-400); }
+
+.td-empty { padding: 0 !important; }
+.empty-inline { text-align: center; padding: 60px 20px; }
+.empty-inline i { font-size: 48px; color: var(--text-muted); opacity: 0.25; margin-bottom: 12px; display: block; }
+.empty-inline p { color: var(--text-muted); font-size: 14px; }
+
+/* ═══════════════════════════════════════════════════════════
+   RATES TABLE — Fixed Column Alignment
+   ═══════════════════════════════════════════════════════════ */
+.rates-table-wrapper { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+.rates-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.rates-table thead { position: sticky; top: 0; z-index: 2; }
+.rates-table thead tr { background: linear-gradient(180deg, rgba(17,42,79,0.95), rgba(17,42,79,0.7)); }
+
+/* TABLE HEADERS */
+.rates-table th { 
+    padding: 15px 12px; 
+    text-align: left; 
+    font-size: 16px;
+    font-weight: 800;
+    text-transform: uppercase; 
+    letter-spacing: 2px; 
+    color: #ffffff;
+    border-bottom: 2px solid rgba(245, 182, 66, 0.3);
+}
+
+/* FIXED COLUMN WIDTHS */
+.th-currency { width: 42% !important; text-align: left !important; }
+.th-code { width: 13% !important; text-align: center !important; }
+.th-buy { width: 22% !important; text-align: right !important; }
+.th-sell { width: 23% !important; text-align: right !important; }
+
+.rates-table-body { flex: 1; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
+.rates-table-body::-webkit-scrollbar { display: none; }
+
+.rate-row { transition: background 0.2s ease; border-bottom: 1px solid rgba(42,108,184,0.06); }
+.rate-row:nth-child(even) { background: rgba(13,31,60,0.25); }
+.rate-row:hover { background: rgba(42,108,184,0.12); }
+.rate-row td { padding: 10px 12px; vertical-align: middle; }
+
+/* CELL ALIGNMENT */
+.td-currency { width: 42%; text-align: left !important; }
+.td-code { width: 13%; text-align: center !important; vertical-align: middle !important; }
+.td-buy { width: 22%; text-align: right !important; }
+.td-sell { width: 23%; text-align: right !important; }
+
+/* FLAG BOX */
+.td-currency {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+}
+
+.flag-box {
+    font-size: 34px;
+    line-height: 1;
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.03);
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.06);
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.35));
+}
+
+/* CURRENCY NAME */
+.currency-name-cell {
+    font-size: 18px;
+    font-weight: 800;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.3px;
+}
+
+/* CODE BADGE - CENTERED */
+.code-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, rgba(42,108,184,0.18), rgba(42,108,184,0.06));
+    border: 1px solid rgba(42,108,184,0.28);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 2px;
+    text-align: center;
+    min-width: 70px;
+}
+
+/* RATE VALUES */
+.rate-val { 
+    font-size: 22px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.3px;
+}
+.rate-buy { color: var(--green-400); }
+.rate-sell { color: var(--red-400); }
+
+.td-empty { padding: 0 !important; }
+.empty-inline { text-align: center; padding: 60px 20px; }
+.empty-inline i { font-size: 48px; color: var(--text-muted); opacity: 0.25; margin-bottom: 12px; display: block; }
+.empty-inline p { color: var(--text-muted); font-size: 14px; }

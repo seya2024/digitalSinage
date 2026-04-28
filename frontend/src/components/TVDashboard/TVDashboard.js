@@ -30,7 +30,6 @@ const currencyToFlagMap = {
    EXTRACT CURRENCY DATA - Handles both nested and flattened responses
    ═══════════════════════════════════════════════════════════ */
 const extractCurrency = (row) => {
-    // Nested currency object (from JOIN)
     if (row.currency && typeof row.currency === 'object') {
         return {
             name: row.currency.name || '',
@@ -40,7 +39,6 @@ const extractCurrency = (row) => {
             icon: row.currency.icon || 'fa-money-bill-wave',
         };
     }
-    // Flattened fields (direct from query)
     return {
         name: row.currency_name || row.name || '',
         code: row.currency_code || row.code || '',
@@ -91,7 +89,6 @@ const TVDashboard = () => {
                 const formattedRates = rows.map((row) => {
                     const cur = extractCurrency(row);
                     
-                    // Get flag - prioritize country_code, then currency code mapping
                     let flag = '💱';
                     if (cur.countryCode && cur.countryCode.length === 2) {
                         flag = countryCodeToFlag(cur.countryCode);
@@ -242,17 +239,17 @@ const TVDashboard = () => {
         });
     };
 
-    /* ─── Ticker Messages ─── */
-    const tickerMessages = useMemo(() => [
-        '🏦 Dashen Bank — Authorized by the National Bank of Ethiopia',
-        '📞 Contact Center: 6333',
-        '💱 Competitive Foreign Exchange Rates',
-        '🔒 Safe & Secure Banking Transactions',
-        '🌟 24/7 Customer Support Available',
-        '💰 Exchange Rate Management System',
-        `📊 Showing ${currencies.length} Currency Pairs`,
-        '📍 Visit any Dashen Bank branch for service',
-    ], [currencies.length]);
+/* ─── Footer Messages for Scrolling Ticker (Amharic - Large Font) ─── */
+/* ─── Footer Messages for Scrolling Ticker (Only Two Messages) ─── */
+/* ─── Footer Messages - Repeated for Smooth Continuous Scroll ─── */
+const footerMessages = useMemo(() => [
+    { icon: 'fa-hand-peace', text: 'አንኳን ወደ ዳሻን ባንክ በደህና መጡ። — ሁልጊዜም አንድ እርምጃ ቀዳሚ!' },
+    { icon: 'fa-hand-peace', text: 'Welcome to Dashen Bank — Dashen Bank always One Step ahead' },
+    { icon: 'fa-hand-peace', text: 'አንኳን ወደ ዳሻን ባንክ በደህና መጡ። — ሁልጊዜም አንድ እርምጃ ቀዳሚ!' },
+    { icon: 'fa-hand-peace', text: 'Welcome to Dashen Bank — Dashen Bank always One Step ahead' },
+    { icon: 'fa-hand-peace', text: 'አንኳን ወደ ዳሻን ባንክ በደህና መጡ። — ሁልጊዜም አንድ እርምጃ ቀዳሚ!' },
+    { icon: 'fa-hand-peace', text: 'Welcome to Dashen Bank — Dashen Bank always One Step ahead' },
+], []);
 
     /* ─── Loading State ─── */
     if (loading) {
@@ -264,7 +261,7 @@ const TVDashboard = () => {
                             <i className="fas fa-landmark"></i>
                         </div>
                     </div>
-                    <h2> ዳሽን ባንክ አ.ማ </h2>
+                    <h2> ዳሽን ባንክ </h2>
                     <div className="loading-bar">
                         <div className="loading-bar-fill"></div>
                     </div>
@@ -285,50 +282,64 @@ const TVDashboard = () => {
             </div>
 
             {/* Header */}
-            <header className="tv-header">
-                <div className="header-left">
-                    <div className="bank-logo">
-                        <div className="logo-icon">
-                            <i className="fas fa-landmark"></i>
-                        </div>
+           <header className="tv-header">
+    <div className="header-left">
+       
+        <div className="bank-logo">
+          
+                <img src="/images/logo.png" alt="Dashen Bank" className="logo-image" />
 
-                        {/* <div className="logo-icon">
-                            <img src="/images/logo.jpg"  alt="Dashen Bank"  className="logo-image"/>
-                        </div> */}
+            <div className="logo-text">
+                
+                <h1>
+                ዳሽን <span className="bank-small">ባንክ</span>
+                </h1>
+                <span className="logo-subtitle">Dashen Bank</span>
+            </div>
+        </div>
+        
+        <div className="header-badge">
+            <div className="badge-icon">
+                <i className="fas fa-tower-cell"></i>
+            </div>
+                <div className="badge-content">
+                <span className="badge-number">24/7 Customer Care : 6333 </span>
+                {/* <span className="badge-number">  6333</span> */}
+            </div>
 
-                        <div className="logo-text">
-                            <h1>ዳሽን ባንክ</h1>
-                            <span className="logo-subtitle">ዕለታዊ የውጭ ምንዛሪ ገበያ ተመኖች</span>
-                        </div>
-                    </div>
-                    
-                    <div className="header-badge">
-                        <span className="badge-eth">Jimma Branch</span>
-                        <span className="badge-label">  </span>
-                    </div>
+        </div>
+    </div>
+
+    <div className="header-right">
+        <div className="rate-count-badge">
+            <i className="fas fa-coins"></i>
+            <span>{currencies.length} Currencies</span>
+        </div>
+        
+        {/* Enhanced DateTime Block with Ethiopian Date */}
+        <div className="datetime-block">
+            <div className="dt-day">{dayName}</div>
+            <div className="dt-dates-container">
+                <div className="dt-date-gregorian">
+                    <i className="fas fa-calendar-alt"></i>
+                    <span>{date}</span>
                 </div>
-
-                <div className="header-right">
-                    <div className="rate-count-badge">
-                        <i className="fas fa-coins"></i>
-                        <span>{currencies.length} Currencies</span>
-                    </div>
-                    <div className="datetime-block">
-                        <div className="dt-day">{dayName}</div>
-                        <div className="dt-date">{date}</div>
-                        <div className="dt-time">
-                            <span className="time-pulse"></span>
-                            {time}
-                        </div>
-                    </div>
-                    <div className={`connection-dot ${connectionStatus}`}>
-                        <span className="dot-tooltip">
-                            {connectionStatus === 'connected' ? 'Live' : 
-                             connectionStatus === 'connecting' ? 'Connecting...' : 'Reconnecting...'}
-                        </span>
-                    </div>
-                </div>
-            </header>
+              
+            </div>
+            <div className="dt-time">
+                <span className="time-pulse"></span>
+                {time}
+            </div>
+        </div>
+        
+        <div className={`connection-dot ${connectionStatus}`}>
+            <span className="dot-tooltip">
+                {connectionStatus === 'connected' ? 'Live' : 
+                 connectionStatus === 'connecting' ? 'Connecting...' : 'Reconnecting...'}
+            </span>
+        </div>
+    </div>
+</header>
 
             {/* Error Bar */}
             {error && (
@@ -346,7 +357,6 @@ const TVDashboard = () => {
             {/* Main Content */}
             <main className={`tv-main ${showTransition ? 'fade-transition' : ''}`}>
                 {hasActiveVideo && activeVideo ? (
-                    /* Split Layout with Video */
                     <div className="tv-split-layout">
                         <div className="tv-video-panel">
                             <div className="panel-label">
@@ -401,7 +411,6 @@ const TVDashboard = () => {
                                     className="rates-table-body"
                                     ref={ratesScrollRef}
                                     onMouseEnter={() => cancelAnimationFrame(scrollAnimRef.current)}
-
                                     onMouseLeave={() => { 
                                         if (isAutoScrolling && scrollEnabledRef.current) startAutoScroll(); 
                                     }}
@@ -412,20 +421,16 @@ const TVDashboard = () => {
                                         <tbody>
                                             {currencies.length > 0 ? currencies.map((item) => (
                                                 <tr key={item.id} className="rate-row">
-
                                                     <td className="td-currency">
                                                         <span className="flag-box">{item._flag}</span>
                                                         <span className="currency-name-cell">{item._name}</span>
                                                     </td>
-
                                                     <td className="td-code">
                                                         <span className="code-badge">{item._code}</span>
                                                     </td>
-
                                                     <td className="td-buy">
                                                         <span className="rate-val rate-buy">{formatRate(item.buy_rate)}</span>
                                                     </td>
-
                                                     <td className="td-sell">
                                                         <span className="rate-val rate-sell">{formatRate(item.sell_rate)}</span>
                                                     </td>
@@ -447,7 +452,6 @@ const TVDashboard = () => {
                         </div>
                     </div>
                 ) : (
-                    /* Fullscreen Grid Layout (No Video) */
                     <div className="tv-fullscreen-rates">
                         <div className="fullscreen-header">
                             <h2>
@@ -523,24 +527,73 @@ const TVDashboard = () => {
                 )}
             </main>
 
-            {/* Footer Ticker */}
-            <footer className="tv-footer">
-                {/* <div className="footer-left">
-                    <span className="footer-brand">
-                        <i className="fas fa-shield-alt"></i> NBE Licensed
+            {/* Enhanced Footer - Increased Height with Welcome Message */}
+         {/* Enhanced Footer - Blue & White Brand Design with Amharic Welcome */}
+
+
+{/* Footer - Blue Background with SCROLLING Text (Amharic) */}
+<footer className="tv-footer">
+    {/* Left Section - Bank Brand */}
+    <div className="footer-left">
+        <div className="brand-logo">
+            <i className="fas fa-landmark"></i>
+            <span className="brand-name">
+            Jimma Branch 
+                
+            </span>
+        </div>
+     
+    </div>
+
+    {/* Center Section - SCROLLING TICKER (Amharic) */}
+    <div className="footer-center">
+        {/* Welcome Banner - Static Amharic */}
+        <div className="welcome-banner">
+            <div className="welcome-text-amharic">
+           
+             {/* Welcome Banner - Clean One Line */}
+<div className="datetime-block">
+    {/* <div className="dt-day">{dayName}</div> */}
+    <div className="dt-dates">
+        <span className="gregorian-date">📅 12/06/2026 G.C </span>
+        <span className="ethiopian-date"> - 20/02/2018 ዓ.ም</span>
+    </div>
+    
+</div>
+        
+            </div>
+        </div>
+        
+        {/* SCROLLING TICKER - Amharic Text */}
+        <div className="ticker-track">
+            <div className="ticker-content">
+                {[...footerMessages, ...footerMessages].map((msg, i) => (
+                    <span key={i} className="ticker-item">
+                        <i className={`fas ${msg.icon}`}></i>
+                        <span className="ticker-separator">✦</span>
+                        {msg.text}
                     </span>
-                </div> */}
-                <div className="ticker-track">
-                    <div className="ticker-content">
-                        {[...tickerMessages, ...tickerMessages].map((msg, i) => (
-                            <span key={i} className="ticker-item">{msg}</span>
-                        ))}
-                    </div>
-                </div>
-                <div className="footer-right">
-                    <span className="footer-version">v2.0</span>
-                </div>
-            </footer>
+                ))}
+            </div>
+        </div>
+    </div>
+
+    {/* Right Section - Status & Version */}
+    <div className="footer-right">
+        <div className="footer-status">
+            <span className={`status-dot ${connectionStatus === 'connected' ? 'live' : 'connecting'}`}></span>
+            <span className="status-text">
+                {connectionStatus === 'connected' ? 'LIVE' : 'CONNECTING'}
+            </span>
+        </div>
+        <div className="footer-divider"></div>
+        <div className="footer-version">
+            <i className="fas fa-code-branch"></i>
+            <span>v2.0</span>
+        </div>
+    </div>
+</footer>
+
         </div>
     );
 };

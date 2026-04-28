@@ -48,7 +48,7 @@ const AdminLogin = () => {
                             }}
                         />
                     </div>
-                    <h2>ዳሽን ባንክ አ.ማ</h2>
+                    <h2>ዳሽን ባንክ</h2>
                     <p>ዕለታዊ የውጭ ምንዛሪ ገበያ ተመኖች</p>
                     <small>Exchange Rate Management System</small>
                 </div>

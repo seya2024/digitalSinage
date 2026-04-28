@@ -307,9 +307,12 @@ const AdminPanel = () => {
                     <i className={`fas ${sidebarOpen ? 'fa-times' : 'fa-bars'}`}></i>
                 </button>
                 <div className="admin-logo">
-                    <i className="fas fa-landmark"></i>
+          
+                         <img src="/images/logo.png" alt="Dashen Bank" className="logo-image" />
+
                     <div className="logo-text">
                         <span>DASHEN BANK</span>
+                          <h3>ዳሽን ባንክ </h3>
                         <small>Exchange Rate Management System</small>
                     </div>
                 </div>
@@ -342,10 +345,10 @@ const AdminPanel = () => {
             <div className="admin-layout">
                 {/* Sidebar - Blue Theme */}
                 <aside className={`admin-sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
-                    <div className="sidebar-header">
+                    {/* <div className="sidebar-header">
                         <i className="fas fa-chart-line"></i>
                         <span>Exchange Manager</span>
-                    </div>
+                    </div> */}
                     <nav className="sidebar-nav">
                         {menuItems.map(item => (
                             <button
