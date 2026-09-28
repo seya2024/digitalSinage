@@ -22,15 +22,30 @@ router.patch('/:id/message', protect, adminOnly, updateBranchMessage);
 router.delete('/:id', protect, adminOnly, deleteBranch);
 // routes/branchRoutes.js
 router.post('/:code/heartbeat', async (req, res) => {
-    await pool.execute(
-        `UPDATE branches 
-         SET last_heartbeat = NOW(), 
-             status = 'online',
-             version = ?
-         WHERE code = ?`,
-        [req.body.version || 'v2.0', req.params.code]
-    );
-    res.json({ success: true });
+    try {
+        const { code } = req.params;
+        const { version } = req.body || {};
+        const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
+        const [result] = await pool.execute(
+            `UPDATE branches
+             SET last_heartbeat = NOW(),
+                 tv_status = 'online',
+                 tv_version = COALESCE(?, tv_version),
+                 tv_ip = ?
+             WHERE code = ?`,
+            [version || null, ip, code]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: 'Branch not found' });
+        }
+
+        res.json({ success: true, message: 'Heartbeat recorded' });
+    } catch (error) {
+        console.error('Heartbeat error:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
 });
 
 module.exports = router;
