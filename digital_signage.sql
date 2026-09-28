@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 28, 2026 at 07:09 PM
+-- Generation Time: Sep 28, 2026 at 08:53 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -68,7 +68,7 @@ INSERT INTO `branches` (`id`, `code`, `name`, `district_id`, `grade`, `message`,
 (1, '021', 'Jimma Branch', 7, 'III', 'We are here to serve you passionately!', '2026-09-28 13:13:59', '2026-09-28 16:05:57', NULL, 'unknown', 'v1.0', '192.168.163.251'),
 (2, '471', 'Hirmata Branch', 7, 'I', 'We are here to serve you passionately!', '2026-09-28 13:13:59', '2026-09-28 13:51:13', NULL, 'unknown', 'v1.0', NULL),
 (3, '104', 'Bonga Branch', 11, 'II', 'We are here to serve you passionately!', '2026-09-28 13:13:59', '2026-09-28 13:51:48', NULL, 'unknown', 'v1.0', NULL),
-(4, '054', 'Bedele Branch', 7, 'II', 'We are here to serve you passionately!', '2026-09-28 13:13:59', '2026-09-28 13:51:39', NULL, 'unknown', 'v1.0', NULL);
+(4, '054', 'Bedele Branch', 7, 'II', 'We are here to serve you passionately!', '2026-09-28 13:13:59', '2026-09-28 18:53:12', '2026-09-28 18:53:12', 'online', 'v2.0', '127.0.0.1');
 
 -- --------------------------------------------------------
 
@@ -283,7 +283,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `email`, `full_name`, `role`, `is_active`, `last_login`, `created_at`, `updated_at`) VALUES
-(1, 'admin', '$2a$10$OjxJqRWCFnSSYi6vI57b4eiA1f20AnNVZaCNok4ItT17olyBM7u82', 'seidm2031@gmail.com', NULL, 'super_admin', 1, '2026-09-28 16:05:18', '2026-09-28 13:15:07', '2026-09-28 16:05:18'),
+(1, 'admin', '$2a$10$OjxJqRWCFnSSYi6vI57b4eiA1f20AnNVZaCNok4ItT17olyBM7u82', 'seidm2031@gmail.com', NULL, 'super_admin', 1, '2026-09-28 18:04:37', '2026-09-28 13:15:07', '2026-09-28 18:04:37'),
 (2, 'ibd_user', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'ibd@dashenbank.com', NULL, '', 1, NULL, '2026-09-28 13:15:07', '2026-09-28 13:15:07'),
 (3, 'ibd_manager', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'ibd.manager@dashenbank.com', NULL, '', 1, NULL, '2026-09-28 13:15:07', '2026-09-28 13:15:07'),
 (4, 'ibd_officer', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'ibd.officer@dashenbank.com', NULL, '', 1, NULL, '2026-09-28 13:15:07', '2026-09-28 13:15:07'),

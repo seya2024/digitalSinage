@@ -29,3 +29,27 @@ Step 2: Kill that process on powershell
 Step 3 Run Again Backend Server as ff
 
    - npm run dev
+
+ ==========================================================
+
+ Option A — PowerShell (Recommended)
+Open PowerShell as Administrator:
+
+Press Win + X → Windows PowerShell (Admin) or Terminal (Admin)
+
+Navigate and run:
+
+powershell
+
+cd C:\xampp\htdocs\digitalSigage
+Set-ExecutionPolicy Bypass -Scope Process -Force
+.\setup-tv-kiosk.ps1
+
+-------------------------------------------------------------
+The script will ask:
+
+- Branch code → e.g., 054 or JIM001
+- Server URL → press Enter for http://localhost:3000
+- Windows password → typed securely
+- Launch now? → type y or n
+=================================================================
