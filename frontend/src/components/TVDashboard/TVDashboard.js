@@ -378,11 +378,11 @@ const TVDashboard = () => {
     /* ─── Footer Messages for Scrolling Ticker ─── */
     const footerMessages = useMemo(() => [
         { text: 'አንኳን ወደ ዳሻን ባንክ በደህና መጡ። — ዳሻን ባንክ ሁልጊዜም አንድ እርምጃ ቀዳሚ!' },
-        { text: 'Welcome to Dashen Bank — Dashen Bank always One Step ahead' },
+        { text: 'Welcome to Dashen Bank — Dashen Bank Always One Step Ahead' },
         { text: 'አንኳን ወደ ዳሻን ባንክ በደህና መጡ። — ዳሻን ባንክ ሁልጊዜም አንድ እርምጃ ቀዳሚ!' },
-        { text: 'Welcome to Dashen Bank — Dashen Bank always One Step ahead' },
+        { text: 'Welcome to Dashen Bank — Dashen Bank Always One Step Ahead' },
         { text: 'አንኳን ወደ ዳሻን ባንክ በደህና መጡ። — ሁልጊዜም አንድ እርምጃ ቀዳሚ!' },
-        { text: 'Welcome to Dashen Bank — Dashen Bank always One Step ahead' },
+        { text: 'Welcome to Dashen Bank — Dashen Bank Always One Step Ahead' },
     ], []);
 
     /* ─── Loading State ─── */
