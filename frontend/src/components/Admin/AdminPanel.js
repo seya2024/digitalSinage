@@ -14,6 +14,8 @@ import ProfileManager from './ProfileManager';
 import DistrictManager from './DistrictManager';
 import BranchManager from './BranchManager';
 
+import TVMonitor from './TVMonitor';
+
 // Rate History Component - Fixed with safe number formatting
 const RateHistory = () => {
     const [currencies, setCurrencies] = useState([]);
@@ -272,11 +274,14 @@ const AdminPanel = () => {
         { id: 'pending', label: 'Pending Approvals', icon: 'fa-clock' },
         { id: 'districts', label: 'District Manager', icon: 'fa-building' },
         { id: 'branches', label: 'Branch Manager', icon: 'fa-code-branch' },
+        { id: 'tvmonitor', label: 'Remote Monitoring', icon: 'fa-desktop' },
         { id: 'videos', label: 'Video Manager', icon: 'fa-video' },
         { id: 'users', label: 'User Management', icon: 'fa-users' },
         { id: 'reports', label: 'Rate History', icon: 'fa-chart-line' },
         { id: 'settings', label: 'Settings', icon: 'fa-cog' },
         { id: 'profile', label: 'My Profile', icon: 'fa-user-circle' }
+
+
     ];
 
     const renderContent = () => {
@@ -301,6 +306,8 @@ const AdminPanel = () => {
                 return <Settings />;
             case 'profile':
                 return <ProfileManager />;
+            case 'tvmonitor':
+                 return <TVMonitor />;
             default:
                 return <DashboardStats />;
         }

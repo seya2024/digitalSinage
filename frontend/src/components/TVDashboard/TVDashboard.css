@@ -617,3 +617,19 @@ html, body {
     .tv-warning-bar i { font-size: 16px; }
     .tv-warning-bar code { font-size: 11px; }
 }
+
+.tv-offline-bar {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%) !important;
+    color: #ffffff !important;
+    padding: 12px 28px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    z-index: 9999 !important;
+    min-height: 44px !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    position: relative !important;
+}

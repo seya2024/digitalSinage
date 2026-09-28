@@ -4,9 +4,10 @@ import { currencyService } from '../../services/currencyService';
 import { videoService } from '../../services/videoService';
 import { branchService } from '../../services/branchService';
 import './TVDashboard.css';
+import api from '../../services/api';
 
 /* ═══════════════════════════════════════════════════════════
-   FLAG HELPERS - Converts country_code to flag emoji
+   FLAG HELPERS
    ═══════════════════════════════════════════════════════════ */
 const countryCodeToFlag = (code) => {
     if (!code || typeof code !== 'string' || code.length !== 2) return '💱';
@@ -20,11 +21,11 @@ const countryCodeToFlag = (code) => {
     }
 };
 
-// Fallback mapping for currencies without country_code
 const currencyToFlagMap = {
     'USD': '🇺🇸', 'EUR': '🇪🇺', 'GBP': '🇬🇧', 'SAR': '🇸🇦',
     'CNY': '🇨🇳', 'JPY': '🇯🇵', 'AUD': '🇦🇺', 'CAD': '🇨🇦',
-    'CHF': '🇨🇭', 'AED': '🇦🇪', 'ZAR': '🇿🇦', 'INR': '🇮🇳'
+    'CHF': '🇨🇭', 'AED': '🇦🇪', 'ZAR': '🇿🇦', 'INR': '🇮🇳',
+    'KES': '🇰🇪', 'SEK': '🇸🇪'
 };
 
 /* ═══════════════════════════════════════════════════════════
@@ -58,8 +59,12 @@ const TVDashboard = () => {
     const [effectiveDate, setEffectiveDate] = useState('');
     const [error, setError] = useState(null);
     const [hasActiveVideo, setHasActiveVideo] = useState(false);
+
     const [connectionStatus, setConnectionStatus] = useState('connecting');
+    const [usingCache, setUsingCache] = useState(false);
+    const [cacheAge, setCacheAge] = useState(null);
     const [retryCount, setRetryCount] = useState(0);
+
     const [showTransition, setShowTransition] = useState(false);
 
     // ⭐ Branch state
@@ -74,23 +79,29 @@ const TVDashboard = () => {
     const scrollEnabledRef = useRef(false);
 
     /* ─── Branch code from URL ─── */
-const branchCode = useMemo(() => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('branch') || null;
-}, []);
+    const branchCode = useMemo(() => {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('branch') || null;
+    }, []);
 
     /* ─── Load Branch Info ─── */
     useEffect(() => {
         const loadBranch = async () => {
+            if (!branchCode) {
+                setBranch(null);
+                return;
+            }
             try {
                 const res = await branchService.getByCode(branchCode);
                 if (res.success) {
                     setBranch(res.data);
                 } else {
                     console.warn('Branch not found:', branchCode);
+                    setBranch(null);
                 }
             } catch (err) {
                 console.error('Failed to load branch:', err);
+                setBranch(null);
             }
         };
         loadBranch();
@@ -99,6 +110,26 @@ const branchCode = useMemo(() => {
         const branchInterval = setInterval(loadBranch, 300000);
         return () => clearInterval(branchInterval);
     }, [branchCode]);
+
+    /* ─── Heartbeat — ping backend every 60 seconds ─── */
+    useEffect(() => {
+        if (!branchCode || !branch) return;
+
+        const sendHeartbeat = async () => {
+            try {
+                await api.post(`/branches/${branchCode}/heartbeat`, {
+                    version: 'v2.0'
+                });
+                console.log('✅ Heartbeat sent');
+            } catch (err) {
+                console.warn('Heartbeat failed:', err.message);
+            }
+        };
+
+        sendHeartbeat();
+        const interval = setInterval(sendHeartbeat, 60000);
+        return () => clearInterval(interval);
+    }, [branchCode, branch]);
 
     /* ─── Data Loading ─── */
     const loadData = useCallback(async () => {
@@ -112,6 +143,8 @@ const branchCode = useMemo(() => {
             ]);
 
             setConnectionStatus('connected');
+            setUsingCache(false);
+            setCacheAge(null);
             setRetryCount(0);
 
             if (ratesRes.success) {
@@ -156,6 +189,19 @@ const branchCode = useMemo(() => {
                         }));
                     }
                 }
+
+                // ⭐ SAVE TO CACHE
+                try {
+                    localStorage.setItem('dashen_tv_cache', JSON.stringify({
+                        currencies: formattedRates,
+                        effectiveDate: formattedRates[0]?.effective_date || '',
+                        lastUpdate: new Date().toISOString(),
+                        timestamp: Date.now()
+                    }));
+                    console.log('✅ Cache saved:', formattedRates.length, 'currencies');
+                } catch (e) {
+                    console.warn('Cache save failed:', e);
+                }
             } else {
                 setError('Failed to load exchange rates');
                 setConnectionStatus('error');
@@ -168,10 +214,36 @@ const branchCode = useMemo(() => {
             setActiveVideo(hasVideo ? videoRes.data : null);
 
         } catch (err) {
-            console.error('Error loading TV data:', err);
+            console.error('❌ Error loading TV data:', err);
             setConnectionStatus('error');
             setRetryCount(prev => prev + 1);
-            setError(`Connection error. Retrying (${retryCount + 1})...`);
+
+            // ⭐ LOAD FROM CACHE
+            console.log('🔄 Attempting to load from cache...');
+            try {
+                const cached = localStorage.getItem('dashen_tv_cache');
+                console.log('Cache found?', !!cached);
+
+                if (cached) {
+                    const { currencies: c, lastUpdate: lu, timestamp } = JSON.parse(cached);
+                    console.log('Cached currencies:', c?.length);
+
+                    if (Array.isArray(c) && c.length > 0) {
+                        setCurrencies(c);
+                        setUsingCache(true);
+                        setCacheAge(Math.floor((Date.now() - timestamp) / 1000));
+                        if (lu) setLastUpdate(new Date(lu).toLocaleString());
+                        setError(null);
+                        console.log('✅ usingCache = true, banner should show');
+                        return;
+                    }
+                }
+                console.log('⚠ No usable cache — showing error');
+                setError(`Connection error. Retrying (${retryCount + 1})...`);
+            } catch (cacheErr) {
+                console.warn('Cache read failed:', cacheErr);
+                setError(`Connection error. Retrying (${retryCount + 1})...`);
+            }
         } finally {
             setLoading(false);
         }
@@ -189,6 +261,15 @@ const branchCode = useMemo(() => {
             clearTimeout(pauseTimerRef.current);
         };
     }, [loadData]);
+
+    /* ─── Offline mode cache-age ticker ─── */
+    useEffect(() => {
+        if (!usingCache || !cacheAge) return;
+        const t = setInterval(() => {
+            setCacheAge(prev => (prev ? prev + 1 : 1));
+        }, 1000);
+        return () => clearInterval(t);
+    }, [usingCache, cacheAge]);
 
     /* ─── Auto-Scroll Logic ─── */
     const startAutoScroll = useCallback(() => {
@@ -247,6 +328,14 @@ const branchCode = useMemo(() => {
         if (isAutoScrolling && scrollEnabledRef.current) startAutoScroll();
         return () => cancelAnimationFrame(scrollAnimRef.current);
     }, [isAutoScrolling, startAutoScroll]);
+
+    /* ⭐ Helper — formats seconds into "5m ago" / "2h ago" */
+    const formatCacheAge = (seconds) => {
+        if (!seconds) return 'just now';
+        if (seconds < 60) return `${seconds}s ago`;
+        if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+        return `${Math.floor(seconds / 3600)}h ago`;
+    };
 
     /* ─── Formatters ─── */
     const { date, time, dayName } = useMemo(() => {
@@ -328,7 +417,7 @@ const branchCode = useMemo(() => {
                             <i className="fas fa-tower-cell"></i>
                         </div>
                         <div className="badge-content">
-                            <span className="badge-number">24/7 Customer Care : 6333 </span>
+                            <span className="badge-number">24/7 Customer Care : 6333</span>
                         </div>
                     </div>
                 </div>
@@ -339,7 +428,6 @@ const branchCode = useMemo(() => {
                         <span>{currencies.length} Currencies</span>
                     </div>
 
-                    {/* Enhanced DateTime Block */}
                     <div className="datetime-block">
                         <div className="dt-day">{dayName}</div>
                         <div className="dt-dates-container">
@@ -362,10 +450,6 @@ const branchCode = useMemo(() => {
                 </div>
             </header>
 
-
-
-
-               {/* Error Bar */}
             {/* ⭐ Red Warning — Unknown / Missing Branch */}
             {!branch && (
                 <div className="tv-warning-bar">
@@ -378,7 +462,20 @@ const branchCode = useMemo(() => {
                 </div>
             )}
 
-           
+            {/* ⭐ Offline Mode Banner */}
+            {usingCache && (
+                <div className="tv-offline-bar">
+                    <i className="fas fa-wifi"></i>
+                    <span>
+                        <strong>OFFLINE MODE</strong> — Showing cached rates from {formatCacheAge(cacheAge)}
+                    </span>
+                    <span className="offline-retry">
+                        <i className="fas fa-sync-alt"></i> Retrying in 30s
+                    </span>
+                </div>
+            )}
+
+            {/* Error Bar */}
             {error && (
                 <div className="tv-error-bar">
                     <div className="error-content">
@@ -434,16 +531,6 @@ const branchCode = useMemo(() => {
                             </div>
 
                             <div className="rates-table-wrapper">
-                                <table className="rates-table">
-                                    <thead>
-                                        <tr>
-                                            <th className="th-currency">CURRENCY</th>
-                                            <th className="th-code">CODE</th>
-                                            <th className="th-buy">BUYING (ETB)</th>
-                                            <th className="th-sell">SELLING (ETB)</th>
-                                        </tr>
-                                    </thead>
-                                </table>
                                 <div
                                     className="rates-table-body"
                                     ref={ratesScrollRef}
@@ -455,14 +542,22 @@ const branchCode = useMemo(() => {
                                     onTouchStart={() => pauseAutoScroll(12000)}>
 
                                     <table className="rates-table">
+                                        <thead>
+                                            <tr>
+                                                <th className="th-currency">CURRENCY</th>
+                                                <th className="th-code">CODE</th>
+                                                <th className="th-buy">BUYING (ETB)</th>
+                                                <th className="th-sell">SELLING (ETB)</th>
+                                            </tr>
+                                        </thead>
                                         <tbody>
                                             {currencies.length > 0 ? currencies.map((item) => (
                                                 <tr key={item.id} className="rate-row">
                                                     <td className="td-currency">
-                                                        <span className="flag-box">{item._flag}</span>
                                                         <span className="currency-name-cell">{item._name}</span>
                                                     </td>
                                                     <td className="td-code">
+                                                        <span className="flag-icon">{item._flag}</span>
                                                         <span className="code-badge">{item._code}</span>
                                                     </td>
                                                     <td className="td-buy">
@@ -522,8 +617,7 @@ const branchCode = useMemo(() => {
                                 if (isAutoScrolling && scrollEnabledRef.current) startAutoScroll();
                             }}
                             onWheel={() => pauseAutoScroll(12000)}
-                            onTouchStart={() => pauseAutoScroll(12000)}
-                        >
+                            onTouchStart={() => pauseAutoScroll(12000)}>
                             {currencies.length > 0 ? (
                                 <div className="grid-cards">
                                     {currencies.map((item) => (
@@ -566,28 +660,24 @@ const branchCode = useMemo(() => {
 
             {/* Footer */}
             <footer className="tv-footer">
-                {/* Left Section - Branch Name */}
-            <div className="footer-left">
-                <div className={`brand-logo ${!branch ? 'unknown-branch' : ''}`}>
-                    <i className={`fas ${!branch ? 'fa-exclamation-triangle' : 'fa-map-marker-alt'}`}></i>
-                    <span className="brand-name">
-                        {branch?.name || (branchCode ? `Unknown: ${branchCode}` : 'Unknown Branch')}
-                    </span>
-                </div>
-                {branch?.district_name && (
-                    <div className="footer-contact">
-                        <i className="fas fa-building"></i>
-                        <span>{branch.district_name}</span>
+                <div className="footer-left">
+                    <div className={`brand-logo ${!branch ? 'unknown-branch' : ''}`}>
+                        <i className={`fas ${!branch ? 'fa-exclamation-triangle' : 'fa-map-marker-alt'}`}></i>
+                        <span className="brand-name">
+                            {branch?.name || (branchCode ? `Unknown: ${branchCode}` : 'Unknown Branch')}
+                        </span>
                     </div>
-                )}
-            </div>
+                    {branch?.district_name && (
+                        <div className="footer-contact">
+                            <i className="fas fa-building"></i>
+                            <span>{branch.district_name}</span>
+                        </div>
+                    )}
+                </div>
 
-                {/* Center Section - Welcome Banner + Scrolling Ticker */}
                 <div className="footer-center">
-                    {/* Branch Message Banner */}
                     <div className="welcome-banner">
                         <div className="welcome-text-amharic">
-                            {/* Branch-specific message takes priority */}
                             {branch?.message ? (
                                 <span className="welcome-message-white">
                                     {branch.message}
@@ -601,7 +691,6 @@ const branchCode = useMemo(() => {
                         </div>
                     </div>
 
-                    {/* Scrolling Ticker */}
                     <div className="ticker-track">
                         <div className="ticker-content">
                             {[...footerMessages, ...footerMessages].map((msg, i) => (
@@ -615,7 +704,6 @@ const branchCode = useMemo(() => {
                     </div>
                 </div>
 
-                {/* Right Section - Status & Version */}
                 <div className="footer-right">
                     <div className="footer-status">
                         <span className={`status-dot ${connectionStatus === 'connected' ? 'live' : 'connecting'}`}></span>

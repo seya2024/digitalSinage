@@ -1,0 +1,156 @@
+.tv-monitor { animation: fadeIn 0.3s ease; padding: 8px; }
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.section-header h2 {
+    font-size: 1.3rem;
+    color: #003366;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.monitor-info { display: flex; align-items: center; gap: 12px; }
+
+.refresh-time {
+    font-size: 0.85rem;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-refresh {
+    padding: 6px 14px;
+    background: #003366;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.monitor-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 16px 20px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border-left: 4px solid;
+    transition: all 0.2s;
+}
+
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+.stat-card i { font-size: 2rem; }
+.stat-card h3 { font-size: 1.8rem; margin: 0; color: #003366; }
+.stat-card p { margin: 0; color: #64748b; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+
+.stat-total   { border-left-color: #003366; }
+.stat-total i { color: #003366; }
+.stat-online   { border-left-color: #28a745; }
+.stat-online i { color: #28a745; }
+.stat-warning   { border-left-color: #ffc107; }
+.stat-warning i { color: #ffc107; }
+.stat-offline   { border-left-color: #dc3545; }
+.stat-offline i { color: #dc3545; }
+.stat-never   { border-left-color: #94a3b8; }
+.stat-never i { color: #94a3b8; }
+
+.monitor-filters {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 1.2rem;
+    flex-wrap: wrap;
+}
+
+.filter-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.filter-tabs button {
+    padding: 8px 14px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #495057;
+    transition: all 0.2s;
+}
+
+.filter-tabs button.active { background: #003366; color: white; border-color: #003366; }
+
+.search-input {
+    padding: 9px 14px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    min-width: 260px;
+}
+
+.monitor-table-wrapper {
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.monitor-table { width: 100%; border-collapse: collapse; }
+.monitor-table thead { position: sticky; top: 0; background: #f8f9fa; z-index: 2; }
+.monitor-table th {
+    padding: 12px 14px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #495057;
+    border-bottom: 2px solid #e9ecef;
+}
+.monitor-table td { padding: 12px 14px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+.monitor-table tr:hover { background: #f8f9fa; }
+
+.row-offline { background: rgba(220, 53, 69, 0.04); }
+.row-warning { background: rgba(255, 193, 7, 0.04); }
+
+.branch-name { font-weight: 600; color: #212529; }
+.branch-code { font-family: monospace; font-weight: 700; color: #003366; }
+.ip-cell { font-family: monospace; font-size: 0.78rem; color: #64748b; }
+
+.tv-status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.status-online  { background: #d4edda; color: #155724; }
+.status-warning { background: #fff3cd; color: #856404; }
+.status-offline { background: #f8d7da; color: #721c24; }
+.status-never   { background: #e9ecef; color: #495057; }
+
+.empty-state { text-align: center; padding: 40px; color: #94a3b8; }
+.empty-state i { font-size: 3rem; opacity: 0.4; display: block; margin-bottom: 12px; }
