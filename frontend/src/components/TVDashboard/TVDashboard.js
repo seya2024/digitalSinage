@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import VideoPlayer from './VideoPlayer';
 import { currencyService } from '../../services/currencyService';
 import { videoService } from '../../services/videoService';
+import { branchService } from '../../services/branchService';
 import './TVDashboard.css';
 
 /* ═══════════════════════════════════════════════════════════
@@ -27,7 +28,7 @@ const currencyToFlagMap = {
 };
 
 /* ═══════════════════════════════════════════════════════════
-   EXTRACT CURRENCY DATA - Handles both nested and flattened responses
+   EXTRACT CURRENCY DATA
    ═══════════════════════════════════════════════════════════ */
 const extractCurrency = (row) => {
     if (row.currency && typeof row.currency === 'object') {
@@ -61,6 +62,9 @@ const TVDashboard = () => {
     const [retryCount, setRetryCount] = useState(0);
     const [showTransition, setShowTransition] = useState(false);
 
+    // ⭐ Branch state
+    const [branch, setBranch] = useState(null);
+
     // Auto-scroll refs
     const ratesScrollRef = useRef(null);
     const scrollAnimRef = useRef(null);
@@ -68,6 +72,33 @@ const TVDashboard = () => {
     const [isAutoScrolling, setIsAutoScrolling] = useState(true);
     const [scrollDirection, setScrollDirection] = useState('down');
     const scrollEnabledRef = useRef(false);
+
+    /* ─── Branch code from URL ─── */
+    const branchCode = useMemo(() => {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('branch') || 'JIM001'; // default fallback
+    }, []);
+
+    /* ─── Load Branch Info ─── */
+    useEffect(() => {
+        const loadBranch = async () => {
+            try {
+                const res = await branchService.getByCode(branchCode);
+                if (res.success) {
+                    setBranch(res.data);
+                } else {
+                    console.warn('Branch not found:', branchCode);
+                }
+            } catch (err) {
+                console.error('Failed to load branch:', err);
+            }
+        };
+        loadBranch();
+
+        // Refresh branch info every 5 minutes (message updates)
+        const branchInterval = setInterval(loadBranch, 300000);
+        return () => clearInterval(branchInterval);
+    }, [branchCode]);
 
     /* ─── Data Loading ─── */
     const loadData = useCallback(async () => {
@@ -88,14 +119,14 @@ const TVDashboard = () => {
 
                 const formattedRates = rows.map((row) => {
                     const cur = extractCurrency(row);
-                    
+
                     let flag = '💱';
                     if (cur.countryCode && cur.countryCode.length === 2) {
                         flag = countryCodeToFlag(cur.countryCode);
                     } else if (currencyToFlagMap[cur.code]) {
                         flag = currencyToFlagMap[cur.code];
                     }
-                    
+
                     return {
                         id: row.id,
                         sell_rate: row.sell_rate ? parseFloat(row.sell_rate) : null,
@@ -179,15 +210,15 @@ const TVDashboard = () => {
 
             if (scrollDirection === 'down') {
                 c.scrollTop += speed;
-                if (c.scrollTop >= maxScroll - 1) { 
-                    setScrollDirection('up'); 
-                    c.scrollTop = maxScroll; 
+                if (c.scrollTop >= maxScroll - 1) {
+                    setScrollDirection('up');
+                    c.scrollTop = maxScroll;
                 }
             } else {
                 c.scrollTop -= speed;
-                if (c.scrollTop <= 1) { 
-                    setScrollDirection('down'); 
-                    c.scrollTop = 0; 
+                if (c.scrollTop <= 1) {
+                    setScrollDirection('down');
+                    c.scrollTop = 0;
                 }
             }
             scrollAnimRef.current = requestAnimationFrame(animate);
@@ -221,11 +252,11 @@ const TVDashboard = () => {
     const { date, time, dayName } = useMemo(() => {
         const d = currentDateTime;
         return {
-            date: d.toLocaleDateString('en-GB', { 
-                day: '2-digit', month: 'short', year: 'numeric' 
+            date: d.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
             }),
-            time: d.toLocaleTimeString('en-US', { 
-                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true 
+            time: d.toLocaleTimeString('en-US', {
+                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
             }),
             dayName: d.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase(),
         };
@@ -233,23 +264,21 @@ const TVDashboard = () => {
 
     const formatRate = (val) => {
         if (val == null) return '—';
-        return val.toLocaleString('en-US', { 
-            minimumFractionDigits: 2, 
-            maximumFractionDigits: 4 
+        return val.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 4
         });
     };
 
-/* ─── Footer Messages for Scrolling Ticker (Amharic - Large Font) ─── */
-/* ─── Footer Messages for Scrolling Ticker (Only Two Messages) ─── */
-/* ─── Footer Messages - Repeated for Smooth Continuous Scroll ─── */
-const footerMessages = useMemo(() => [
-    { text: 'አንኳን ወደ ዳሻን ባንክ በደህና መጡ። — ዳሻን ባንክ ሁልጊዜም አንድ እርምጃ ቀዳሚ!' },
-    {  text: 'Welcome to Dashen Bank — Dashen Bank always One Step ahead' },
-    {  text: 'አንኳን ወደ ዳሻን ባንክ በደህና መጡ። — ዳሻን ባንክ ሁልጊዜም አንድ እርምጃ ቀዳሚ!' },
-    {  text: 'Welcome to Dashen Bank — Dashen Bank always One Step ahead' },
-    {  text: 'አንኳን ወደ ዳሻን ባንክ በደህና መጡ። — ሁልጊዜም አንድ እርምጃ ቀዳሚ!' },
-    {  text: 'Welcome to Dashen Bank — Dashen Bank always One Step ahead' },
-], []);
+    /* ─── Footer Messages for Scrolling Ticker ─── */
+    const footerMessages = useMemo(() => [
+        { text: 'አንኳን ወደ ዳሻን ባንክ በደህና መጡ። — ዳሻን ባንክ ሁልጊዜም አንድ እርምጃ ቀዳሚ!' },
+        { text: 'Welcome to Dashen Bank — Dashen Bank always One Step ahead' },
+        { text: 'አንኳን ወደ ዳሻን ባንክ በደህና መጡ። — ዳሻን ባንክ ሁልጊዜም አንድ እርምጃ ቀዳሚ!' },
+        { text: 'Welcome to Dashen Bank — Dashen Bank always One Step ahead' },
+        { text: 'አንኳን ወደ ዳሻን ባንክ በደህና መጡ። — ሁልጊዜም አንድ እርምጃ ቀዳሚ!' },
+        { text: 'Welcome to Dashen Bank — Dashen Bank always One Step ahead' },
+    ], []);
 
     /* ─── Loading State ─── */
     if (loading) {
@@ -282,64 +311,56 @@ const footerMessages = useMemo(() => [
             </div>
 
             {/* Header */}
-           <header className="tv-header">
-    <div className="header-left">
-       
-        <div className="bank-logo">
-          
-                <img src="/images/logo.png" alt="Dashen Bank" className="logo-image" />
+            <header className="tv-header">
+                <div className="header-left">
+                    <div className="bank-logo">
+                        <img src="/images/logo.png" alt="Dashen Bank" className="logo-image" />
+                        <div className="logo-text">
+                            <h1>
+                                ዳሽን <span className="bank-small">ባንክ</span>
+                            </h1>
+                            <span className="logo-subtitle">Dashen Bank</span>
+                        </div>
+                    </div>
 
-            <div className="logo-text">
-                
-                <h1>
-                ዳሽን <span className="bank-small">ባንክ</span>
-                </h1>
-                <span className="logo-subtitle">Dashen Bank</span>
-            </div>
-        </div>
-        
-        <div className="header-badge">
-            <div className="badge-icon">
-                <i className="fas fa-tower-cell"></i>
-            </div>
-                <div className="badge-content">
-                <span className="badge-number">24/7 Customer Care : 6333 </span>
-                {/* <span className="badge-number">  6333</span> */}
-            </div>
-
-        </div>
-    </div>
-
-    <div className="header-right">
-        <div className="rate-count-badge">
-            <i className="fas fa-coins"></i>
-            <span>{currencies.length} Currencies</span>
-        </div>
-        
-        {/* Enhanced DateTime Block with Ethiopian Date */}
-        <div className="datetime-block">
-            <div className="dt-day">{dayName}</div>
-            <div className="dt-dates-container">
-                <div className="dt-date-gregorian">
-                    {/* <i className="fas fa-calendar-alt"></i> */}
-                    <span>{date}</span>
+                    <div className="header-badge">
+                        <div className="badge-icon">
+                            <i className="fas fa-tower-cell"></i>
+                        </div>
+                        <div className="badge-content">
+                            <span className="badge-number">24/7 Customer Care : 6333 </span>
+                        </div>
+                    </div>
                 </div>
-              
-            </div>
-            <div className="dt-time">
-                <span className="time-pulse"></span>
-                {time}
-            </div>
-        </div>
-        
-        <div className={`connection-dot ${connectionStatus}`}>
-            <span className="dot-tooltip">
-                {connectionStatus === 'connected' ? 'Live' : 
-                 connectionStatus === 'connecting' ? 'Connecting...' : 'Reconnecting...'}
-            </span>
-        </div>
-    </div>
-</header>
+
+                <div className="header-right">
+                    <div className="rate-count-badge">
+                        <i className="fas fa-coins"></i>
+                        <span>{currencies.length} Currencies</span>
+                    </div>
+
+                    {/* Enhanced DateTime Block */}
+                    <div className="datetime-block">
+                        <div className="dt-day">{dayName}</div>
+                        <div className="dt-dates-container">
+                            <div className="dt-date-gregorian">
+                                <span>{date}</span>
+                            </div>
+                        </div>
+                        <div className="dt-time">
+                            <span className="time-pulse"></span>
+                            {time}
+                        </div>
+                    </div>
+
+                    <div className={`connection-dot ${connectionStatus}`}>
+                        <span className="dot-tooltip">
+                            {connectionStatus === 'connected' ? 'Live' :
+                             connectionStatus === 'connecting' ? 'Connecting...' : 'Reconnecting...'}
+                        </span>
+                    </div>
+                </div>
+            </header>
 
             {/* Error Bar */}
             {error && (
@@ -411,12 +432,12 @@ const footerMessages = useMemo(() => [
                                     className="rates-table-body"
                                     ref={ratesScrollRef}
                                     onMouseEnter={() => cancelAnimationFrame(scrollAnimRef.current)}
-                                    onMouseLeave={() => { 
-                                        if (isAutoScrolling && scrollEnabledRef.current) startAutoScroll(); 
+                                    onMouseLeave={() => {
+                                        if (isAutoScrolling && scrollEnabledRef.current) startAutoScroll();
                                     }}
                                     onWheel={() => pauseAutoScroll(12000)}
                                     onTouchStart={() => pauseAutoScroll(12000)}>
-                                        
+
                                     <table className="rates-table">
                                         <tbody>
                                             {currencies.length > 0 ? currencies.map((item) => (
@@ -481,8 +502,8 @@ const footerMessages = useMemo(() => [
                             className="fullscreen-grid"
                             ref={ratesScrollRef}
                             onMouseEnter={() => cancelAnimationFrame(scrollAnimRef.current)}
-                            onMouseLeave={() => { 
-                                if (isAutoScrolling && scrollEnabledRef.current) startAutoScroll(); 
+                            onMouseLeave={() => {
+                                if (isAutoScrolling && scrollEnabledRef.current) startAutoScroll();
                             }}
                             onWheel={() => pauseAutoScroll(12000)}
                             onTouchStart={() => pauseAutoScroll(12000)}
@@ -527,73 +548,72 @@ const footerMessages = useMemo(() => [
                 )}
             </main>
 
-            {/* Enhanced Footer - Increased Height with Welcome Message */}
-         {/* Enhanced Footer - Blue & White Brand Design with Amharic Welcome */}
+            {/* Footer */}
+            <footer className="tv-footer">
+                {/* Left Section - Branch Name */}
+                <div className="footer-left">
+                    <div className="brand-logo">
+                        <i className="fas fa-map-marker-alt"></i>
+                        <span className="brand-name">
+                            {branch?.name || branchCode}
+                        </span>
+                    </div>
+                    {branch?.district_name && (
+                        <div className="footer-contact">
+                            <i className="fas fa-building"></i>
+                            <span>{branch.district_name}</span>
+                        </div>
+                    )}
+                </div>
 
+                {/* Center Section - Welcome Banner + Scrolling Ticker */}
+                <div className="footer-center">
+                    {/* Branch Message Banner */}
+                    <div className="welcome-banner">
+                        <div className="welcome-text-amharic">
+                            {/* Branch-specific message takes priority */}
+                            {branch?.message ? (
+                                <span className="welcome-message-white">
+                                    {branch.message}
+                                </span>
+                            ) : (
+                                <div className="dt-dates">
+                                    <span className="gregorian-date">📅 12/06/2026 G.C</span>
+                                    <span className="ethiopian-date">| 20/02/2018 ዓ.ም</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
 
-{/* Footer - Blue Background with SCROLLING Text (Amharic) */}
-<footer className="tv-footer">
-    {/* Left Section - Bank Brand */}
-    <div className="footer-left">
-        <div className="brand-logo">
-            <i className="fas fa-landmark"></i>
-            <span className="brand-name">
-            Jimma Branch 
-                
-            </span>
-        </div>
-     
-    </div>
+                    {/* Scrolling Ticker */}
+                    <div className="ticker-track">
+                        <div className="ticker-content">
+                            {[...footerMessages, ...footerMessages].map((msg, i) => (
+                                <span key={i} className="ticker-item">
+                                    <i className={`fas ${msg.icon}`}></i>
+                                    <span className="ticker-separator">✦</span>
+                                    {msg.text}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                </div>
 
-    {/* Center Section - SCROLLING TICKER (Amharic) */}
-    <div className="footer-center">
-        {/* Welcome Banner - Static Amharic */}
-        <div className="welcome-banner">
-            <div className="welcome-text-amharic">
-           
-             {/* Welcome Banner - Clean One Line */}
-<div className="datetime-block">
-    {/* <div className="dt-day">{dayName}</div> */}
-    <div className="dt-dates">
-        <span className="gregorian-date">📅 12/06/2026 G.C </span>
-        <span className="ethiopian-date"> | 20/02/2018 ዓ.ም</span>
-    </div>
-    
-</div>
-        
-            </div>
-        </div>
-        
-        {/* SCROLLING TICKER - Amharic Text */}
-        <div className="ticker-track">
-            <div className="ticker-content">
-                {[...footerMessages, ...footerMessages].map((msg, i) => (
-                    <span key={i} className="ticker-item">
-                        <i className={`fas ${msg.icon}`}></i>
-                        <span className="ticker-separator">✦</span>
-                        {msg.text}
-                    </span>
-                ))}
-            </div>
-        </div>
-    </div>
-
-    {/* Right Section - Status & Version */}
-    <div className="footer-right">
-        <div className="footer-status">
-            <span className={`status-dot ${connectionStatus === 'connected' ? 'live' : 'connecting'}`}></span>
-            <span className="status-text">
-                {connectionStatus === 'connected' ? 'LIVE' : 'CONNECTING'}
-            </span>
-        </div>
-        <div className="footer-divider"></div>
-        <div className="footer-version">
-            <i className="fas fa-code-branch"></i>
-            <span>v2.0</span>
-        </div>
-    </div>
-</footer>
-
+                {/* Right Section - Status & Version */}
+                <div className="footer-right">
+                    <div className="footer-status">
+                        <span className={`status-dot ${connectionStatus === 'connected' ? 'live' : 'connecting'}`}></span>
+                        <span className="status-text">
+                            {connectionStatus === 'connected' ? 'LIVE' : 'CONNECTING'}
+                        </span>
+                    </div>
+                    <div className="footer-divider"></div>
+                    <div className="footer-version">
+                        <i className="fas fa-code-branch"></i>
+                        <span>v2.0</span>
+                    </div>
+                </div>
+            </footer>
         </div>
     );
 };

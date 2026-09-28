@@ -48,6 +48,10 @@ app.use('/api/currencies', require('./routes/currencyRoutes'));
 app.use('/api/videos', require('./routes/videoRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 
+// District and Branch routes
+app.use('/api/districts', require('./routes/districtRoutes'));
+app.use('/api/branches', require('./routes/branchRoutes'));
+
 // ========== 404 HANDLER ==========
 app.use((req, res) => {
     res.status(404).json({ 

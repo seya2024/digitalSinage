@@ -11,6 +11,9 @@ import { currencyService } from '../../services/currencyService';
 import './AdminPanel.css';
 import ProfileManager from './ProfileManager';
 
+import DistrictManager from './DistrictManager';
+import BranchManager from './BranchManager';
+
 // Rate History Component - Fixed with safe number formatting
 const RateHistory = () => {
     const [currencies, setCurrencies] = useState([]);
@@ -46,7 +49,6 @@ const RateHistory = () => {
         try {
             const response = await currencyService.getRateHistory(currencyId);
             if (response.success) {
-                // Ensure all numeric values are properly formatted
                 const formattedHistory = (response.data || []).map(item => ({
                     ...item,
                     sell_rate: item.sell_rate ? parseFloat(item.sell_rate) : null,
@@ -85,8 +87,8 @@ const RateHistory = () => {
             <div className="history-controls">
                 <div className="select-wrapper">
                     <i className="fas fa-search"></i>
-                    <select 
-                        onChange={(e) => handleCurrencySelect(e.target.value)} 
+                    <select
+                        onChange={(e) => handleCurrencySelect(e.target.value)}
                         className="currency-select"
                         value={selectedCurrency || ''}
                     >
@@ -114,7 +116,7 @@ const RateHistory = () => {
                         </h3>
                         <span className="history-count">{history.length} records found</span>
                     </div>
-                    
+
                     {history.length === 0 ? (
                         <div className="empty-history">
                             <i className="fas fa-chart-line"></i>
@@ -153,8 +155,8 @@ const RateHistory = () => {
                                             </td>
                                             <td className="spread-cell">
                                                 <span className="spread-value">
-                                                    {h.sell_rate && h.buy_rate ? 
-                                                        formatNumber(h.buy_rate - h.sell_rate) : 
+                                                    {h.sell_rate && h.buy_rate ?
+                                                        formatNumber(h.buy_rate - h.sell_rate) :
                                                         'N/A'}
                                                 </span>
                                             </td>
@@ -210,8 +212,8 @@ const Settings = () => {
             <div className="settings-form">
                 <div className="setting-group">
                     <label>Auto-Refresh Interval (seconds)</label>
-                    <input 
-                        type="number" 
+                    <input
+                        type="number"
                         value={settings.autoRefresh}
                         onChange={(e) => setSettings({...settings, autoRefresh: parseInt(e.target.value)})}
                         min="10"
@@ -263,10 +265,13 @@ const AdminPanel = () => {
         setSidebarOpen(!sidebarOpen);
     };
 
-    const menuItems = [ /// Menu Items
+    // ⭐ Menu Items — Added Districts & Branches
+    const menuItems = [
         { id: 'dashboard', label: 'Dashboard', icon: 'fa-tachometer-alt' },
         { id: 'currencies', label: 'Currency Manager', icon: 'fa-coins' },
         { id: 'pending', label: 'Pending Approvals', icon: 'fa-clock' },
+        { id: 'districts', label: 'District Manager', icon: 'fa-building' },
+        { id: 'branches', label: 'Branch Manager', icon: 'fa-code-branch' },
         { id: 'videos', label: 'Video Manager', icon: 'fa-video' },
         { id: 'users', label: 'User Management', icon: 'fa-users' },
         { id: 'reports', label: 'Rate History', icon: 'fa-chart-line' },
@@ -282,6 +287,10 @@ const AdminPanel = () => {
                 return <CurrencyManager />;
             case 'pending':
                 return <PendingApprovals />;
+            case 'districts':                       // ⭐ ADDED
+                return <DistrictManager />;
+            case 'branches':                        // ⭐ ADDED
+                return <BranchManager />;
             case 'videos':
                 return <VideoManager />;
             case 'users':
@@ -290,8 +299,8 @@ const AdminPanel = () => {
                 return <RateHistory />;
             case 'settings':
                 return <Settings />;
-             case 'profile':
-                 return <ProfileManager />;
+            case 'profile':
+                return <ProfileManager />;
             default:
                 return <DashboardStats />;
         }
@@ -307,12 +316,10 @@ const AdminPanel = () => {
                     <i className={`fas ${sidebarOpen ? 'fa-times' : 'fa-bars'}`}></i>
                 </button>
                 <div className="admin-logo">
-          
-                         <img src="/images/logo.png" alt="Dashen Bank" className="logo-image" />
-
+                    <img src="/images/logo.png" alt="Dashen Bank" className="logo-image" />
                     <div className="logo-text">
                         <span>DASHEN BANK</span>
-                          <h3>ዳሽን ባንክ </h3>
+                        <h3>ዳሽን ባንክ</h3>
                         <small>Exchange Rate Management System</small>
                     </div>
                 </div>
@@ -345,10 +352,6 @@ const AdminPanel = () => {
             <div className="admin-layout">
                 {/* Sidebar - Blue Theme */}
                 <aside className={`admin-sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
-                    {/* <div className="sidebar-header">
-                        <i className="fas fa-chart-line"></i>
-                        <span>Exchange Manager</span>
-                    </div> */}
                     <nav className="sidebar-nav">
                         {menuItems.map(item => (
                             <button
@@ -404,8 +407,8 @@ const AdminPanel = () => {
                                 </div>
                                 {/* Developer Photo Tooltip */}
                                 <div className="developer-photo-tooltip">
-                                    <img 
-                                        src="/developer.jpg" 
+                                    <img
+                                        src="/developer.jpg"
                                         alt="Seid Mohammed - Developer"
                                         className="developer-photo"
                                         onError={(e) => {
