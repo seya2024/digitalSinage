@@ -76,7 +76,7 @@ const TVDashboard = () => {
     /* ─── Branch code from URL ─── */
     const branchCode = useMemo(() => {
         const params = new URLSearchParams(window.location.search);
-        return params.get('branch') || 'JIM001'; // default fallback
+        return params.get('branch') || 'Unknown Branch'; // default fallback
     }, []);
 
     /* ─── Load Branch Info ─── */
