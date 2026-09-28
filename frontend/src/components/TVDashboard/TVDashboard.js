@@ -74,10 +74,10 @@ const TVDashboard = () => {
     const scrollEnabledRef = useRef(false);
 
     /* ─── Branch code from URL ─── */
-    const branchCode = useMemo(() => {
-        const params = new URLSearchParams(window.location.search);
-        return params.get('branch') || 'Unknown Branch'; // default fallback
-    }, []);
+const branchCode = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('branch') || null;
+}, []);
 
     /* ─── Load Branch Info ─── */
     useEffect(() => {
@@ -362,7 +362,23 @@ const TVDashboard = () => {
                 </div>
             </header>
 
-            {/* Error Bar */}
+
+
+
+               {/* Error Bar */}
+            {/* ⭐ Red Warning — Unknown / Missing Branch */}
+            {!branch && (
+                <div className="tv-warning-bar">
+                    <i className="fas fa-exclamation-triangle"></i>
+                    <span>
+                        <strong>⚠ INVALID BRANCH</strong> —
+                        {branchCode ? ` Branch "${branchCode}" not found.` : ' No branch code set.'}
+                        {' '}Add <code>?branch=CODE</code> to the URL.
+                    </span>
+                </div>
+            )}
+
+           
             {error && (
                 <div className="tv-error-bar">
                     <div className="error-content">
@@ -551,20 +567,20 @@ const TVDashboard = () => {
             {/* Footer */}
             <footer className="tv-footer">
                 {/* Left Section - Branch Name */}
-                <div className="footer-left">
-                    <div className="brand-logo">
-                        <i className="fas fa-map-marker-alt"></i>
-                        <span className="brand-name">
-                            {branch?.name || branchCode}
-                        </span>
-                    </div>
-                    {branch?.district_name && (
-                        <div className="footer-contact">
-                            <i className="fas fa-building"></i>
-                            <span>{branch.district_name}</span>
-                        </div>
-                    )}
+            <div className="footer-left">
+                <div className={`brand-logo ${!branch ? 'unknown-branch' : ''}`}>
+                    <i className={`fas ${!branch ? 'fa-exclamation-triangle' : 'fa-map-marker-alt'}`}></i>
+                    <span className="brand-name">
+                        {branch?.name || (branchCode ? `Unknown: ${branchCode}` : 'Unknown Branch')}
+                    </span>
                 </div>
+                {branch?.district_name && (
+                    <div className="footer-contact">
+                        <i className="fas fa-building"></i>
+                        <span>{branch.district_name}</span>
+                    </div>
+                )}
+            </div>
 
                 {/* Center Section - Welcome Banner + Scrolling Ticker */}
                 <div className="footer-center">
