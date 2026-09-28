@@ -1,26 +1,60 @@
 const { pool } = require('../config/database');
 
 class Currency {
-    static async getAll(withRates = true) {
-        let query = `
-            SELECT c.*, 
-                   er.sell_rate, er.buy_rate, er.effective_date,
-                   er.id as rate_id
-            FROM currencies c
-            LEFT JOIN exchange_rates er ON c.id = er.currency_id 
-                AND er.effective_date = (
-                    SELECT MAX(effective_date) 
-                    FROM exchange_rates 
-                    WHERE currency_id = c.id AND status = 'active'
-                )
-            WHERE c.is_active = TRUE
-            ORDER BY c.display_order ASC, c.name ASC
-        `;
+    // static async getAll(withRates = true) {
+    //     let query = `
+    //         SELECT c.*, 
+    //                er.sell_rate, er.buy_rate, er.effective_date,
+    //                er.id as rate_id
+    //         FROM currencies c
+    //         LEFT JOIN exchange_rates er ON c.id = er.currency_id 
+    //             AND er.effective_date = (
+    //                 SELECT MAX(effective_date) 
+    //                 FROM exchange_rates 
+    //                 WHERE currency_id = c.id AND status = 'active'
+    //             )
+    //         WHERE c.is_active = TRUE
+    //         ORDER BY c.display_order ASC, c.name ASC
+    //     `;
         
-        const [rows] = await pool.execute(query);
-        return rows;
-    }
+    //     const [rows] = await pool.execute(query);
+    //     return rows;
+    // }
 
+    static async getAll(withRates = true) {
+    const query = `
+        SELECT c.*,
+               er.sell_rate,
+               er.buy_rate,
+               er.effective_date,
+               er.id AS rate_id,
+               er_prev.sell_rate AS prev_sell_rate,
+               er_prev.buy_rate  AS prev_buy_rate
+        FROM currencies c
+        LEFT JOIN exchange_rates er 
+            ON c.id = er.currency_id
+            AND er.effective_date = (
+                SELECT MAX(effective_date) FROM exchange_rates
+                WHERE currency_id = c.id AND status = 'active'
+            )
+        LEFT JOIN exchange_rates er_prev
+            ON c.id = er_prev.currency_id
+            AND er_prev.effective_date = (
+                SELECT MAX(effective_date) FROM exchange_rates
+                WHERE currency_id = c.id
+                  AND status = 'active'
+                  AND effective_date < (
+                      SELECT MAX(effective_date) FROM exchange_rates
+                      WHERE currency_id = c.id AND status = 'active'
+                  )
+            )
+        WHERE c.is_active = TRUE
+        ORDER BY c.display_order ASC, c.name ASC
+    `;
+
+    const [rows] = await pool.execute(query);
+    return rows;
+}
     static async getById(id) {
         const [rows] = await pool.execute(
             `SELECT c.*, 

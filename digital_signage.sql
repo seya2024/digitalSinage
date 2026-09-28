@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 20, 2026 at 05:19 PM
+-- Generation Time: Sep 28, 2026 at 07:09 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `dashen_bank`
+-- Database: `digital_signage`
 --
 
 -- --------------------------------------------------------
@@ -38,6 +38,37 @@ CREATE TABLE `activity_logs` (
   `user_agent` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `branches`
+--
+
+CREATE TABLE `branches` (
+  `id` int(11) NOT NULL,
+  `code` varchar(20) NOT NULL,
+  `name` varchar(150) NOT NULL,
+  `district_id` int(11) DEFAULT NULL,
+  `grade` enum('I','II','III','IV','V') NOT NULL DEFAULT 'V',
+  `message` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `last_heartbeat` timestamp NULL DEFAULT NULL,
+  `status` enum('online','offline','unknown') DEFAULT 'unknown',
+  `version` varchar(20) DEFAULT 'v2.0',
+  `tv_ip` varchar(45) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `branches`
+--
+
+INSERT INTO `branches` (`id`, `code`, `name`, `district_id`, `grade`, `message`, `created_at`, `updated_at`, `last_heartbeat`, `status`, `version`, `tv_ip`) VALUES
+(1, '021', 'Jimma Branch', 7, 'III', 'We are here to serve you passionately!', '2026-09-28 13:13:59', '2026-09-28 16:05:57', NULL, 'unknown', 'v1.0', '192.168.163.251'),
+(2, '471', 'Hirmata Branch', 7, 'I', 'We are here to serve you passionately!', '2026-09-28 13:13:59', '2026-09-28 13:51:13', NULL, 'unknown', 'v1.0', NULL),
+(3, '104', 'Bonga Branch', 11, 'II', 'We are here to serve you passionately!', '2026-09-28 13:13:59', '2026-09-28 13:51:48', NULL, 'unknown', 'v1.0', NULL),
+(4, '054', 'Bedele Branch', 7, 'II', 'We are here to serve you passionately!', '2026-09-28 13:13:59', '2026-09-28 13:51:39', NULL, 'unknown', 'v1.0', NULL);
 
 -- --------------------------------------------------------
 
@@ -64,18 +95,50 @@ CREATE TABLE `currencies` (
 --
 
 INSERT INTO `currencies` (`id`, `name`, `code`, `symbol`, `icon`, `country_code`, `display_order`, `is_active`, `created_by`, `created_at`, `updated_at`) VALUES
-(1, 'United States Dollar', 'USD', '$', 'fa-dollar-sign', 'us', 1, 1, 1, '2026-04-20 15:08:29', '2026-04-20 15:08:29'),
-(2, 'Euro', 'EUR', '€', 'fa-euro-sign', 'eu', 2, 1, 1, '2026-04-20 15:08:29', '2026-04-20 15:08:29'),
-(3, 'British Pound Sterling', 'GBP', '£', 'fa-pound-sign', 'gb', 3, 1, 1, '2026-04-20 15:08:29', '2026-04-20 15:08:29'),
-(4, 'Saudi Riyal', 'SAR', '﷼', 'fa-money-bill-wave', 'sa', 4, 1, 1, '2026-04-20 15:08:29', '2026-04-20 15:08:29'),
-(5, 'Chinese Yuan', 'CNY', '¥', 'fa-yen-sign', 'cn', 5, 1, 1, '2026-04-20 15:08:29', '2026-04-20 15:08:29'),
-(6, 'Japanese Yen', 'JPY', '¥', 'fa-yen-sign', 'jp', 6, 1, 1, '2026-04-20 15:08:29', '2026-04-20 15:08:29'),
-(7, 'Australian Dollar', 'AUD', 'A$', 'fa-dollar-sign', 'au', 7, 1, 1, '2026-04-20 15:08:29', '2026-04-20 15:08:29'),
-(8, 'Canadian Dollar', 'CAD', 'C$', 'fa-dollar-sign', 'ca', 8, 1, 1, '2026-04-20 15:08:29', '2026-04-20 15:08:29'),
-(9, 'Swiss Franc', 'CHF', 'CHF', 'fa-money-bill-wave', 'ch', 9, 1, 1, '2026-04-20 15:08:29', '2026-04-20 15:08:29'),
-(10, 'UAE Dirham', 'AED', 'د.إ', 'fa-money-bill-wave', 'ae', 10, 1, 1, '2026-04-20 15:08:29', '2026-04-20 15:08:29'),
-(11, 'South African Rand', 'ZAR', 'R', 'fa-money-bill-wave', 'za', 11, 1, 1, '2026-04-20 15:08:29', '2026-04-20 15:08:29'),
-(12, 'Indian Rupee', 'INR', '₹', 'fa-rupee-sign', 'in', 12, 1, 1, '2026-04-20 15:08:29', '2026-04-20 15:08:29');
+(1, 'US Dollar', 'USD', '$', 'fa-dollar-sign', 'US', 1, 1, 1, '2026-09-28 14:05:28', '2026-09-28 14:05:28'),
+(2, 'Pound Sterling', 'GBP', '£', 'fa-pound-sign', 'GB', 2, 1, 1, '2026-09-28 14:05:28', '2026-09-28 14:05:28'),
+(3, 'United Arab Emirates Dirham', 'AED', 'د.إ', 'fa-money-bill-wave', 'AE', 3, 1, 1, '2026-09-28 14:05:28', '2026-09-28 14:05:28'),
+(4, 'Euro', 'EUR', '€', 'fa-euro-sign', 'EU', 4, 1, 1, '2026-09-28 14:05:28', '2026-09-28 14:05:28'),
+(5, 'Swiss Franc', 'CHF', 'Fr', 'fa-money-bill-wave', 'CH', 5, 1, 1, '2026-09-28 14:05:28', '2026-09-28 14:05:28'),
+(6, 'Kenyan Shilling', 'KES', 'KSh', 'fa-money-bill-wave', 'KE', 6, 1, 1, '2026-09-28 14:05:28', '2026-09-28 14:05:28'),
+(7, 'South African Rand', 'ZAR', 'R', 'fa-money-bill-wave', 'ZA', 7, 1, 1, '2026-09-28 14:05:28', '2026-09-28 14:05:28'),
+(8, 'Swedish Kroner', 'SEK', 'kr', 'fa-money-bill-wave', 'SE', 8, 1, 1, '2026-09-28 14:05:28', '2026-09-28 14:05:28'),
+(9, 'Japanese Yen', 'JPY', '¥', 'fa-yen-sign', 'JP', 9, 1, 1, '2026-09-28 14:05:28', '2026-09-28 14:05:28');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `districts`
+--
+
+CREATE TABLE `districts` (
+  `id` int(11) NOT NULL,
+  `name` varchar(150) NOT NULL,
+  `location_type` enum('city','upcountry') NOT NULL DEFAULT 'upcountry',
+  `contact` varchar(30) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `districts`
+--
+
+INSERT INTO `districts` (`id`, `name`, `location_type`, `contact`, `created_at`, `updated_at`) VALUES
+(1, 'South Addis District', 'city', '+251911000001', '2026-09-28 13:13:48', '2026-09-28 13:45:23'),
+(2, 'East Addis District', 'city', '+251911000002', '2026-09-28 13:13:48', '2026-09-28 13:45:33'),
+(3, 'North Addis District', 'city', '+251911000003', '2026-09-28 13:13:48', '2026-09-28 13:45:43'),
+(4, 'West Addis District', 'city', '+251911000004', '2026-09-28 13:13:48', '2026-09-28 13:45:54'),
+(5, 'Dire Dawa District', 'upcountry', '+251911000005', '2026-09-28 13:13:48', '2026-09-28 13:46:36'),
+(6, 'Adama District', 'upcountry', '+251911000006', '2026-09-28 13:13:48', '2026-09-28 13:46:31'),
+(7, 'Jimma District', 'upcountry', '+251911000007', '2026-09-28 13:13:48', '2026-09-28 13:13:48'),
+(8, 'Hawassa District', 'upcountry', '+251911000008', '2026-09-28 13:13:48', '2026-09-28 13:13:48'),
+(9, 'Mekelle District', 'upcountry', '+251911000009', '2026-09-28 13:13:48', '2026-09-28 13:13:48'),
+(10, 'Bahir Dar District', 'upcountry', '+251911000010', '2026-09-28 13:13:48', '2026-09-28 13:13:48'),
+(11, 'South West District', 'upcountry', '+251911000011', '2026-09-28 13:13:48', '2026-09-28 13:46:54'),
+(13, 'Dessie District', 'upcountry', '+251911000013', '2026-09-28 13:13:48', '2026-09-28 13:13:48'),
+(14, 'Nekemte District', 'upcountry', '+251911000014', '2026-09-28 13:13:48', '2026-09-28 13:13:48'),
+(15, 'Arba Minch District', 'upcountry', '+251911000015', '2026-09-28 13:13:48', '2026-09-28 13:13:48');
 
 -- --------------------------------------------------------
 
@@ -101,18 +164,17 @@ CREATE TABLE `exchange_rates` (
 --
 
 INSERT INTO `exchange_rates` (`id`, `currency_id`, `sell_rate`, `buy_rate`, `effective_date`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES
-(1, 1, 153.0501, 156.1111, '2026-04-20', 'active', 1, NULL, '2026-04-20 15:08:29', '2026-04-20 15:08:29'),
-(2, 2, 181.8235, 185.4599, '2026-04-20', 'active', 1, NULL, '2026-04-20 15:08:29', '2026-04-20 15:08:29'),
-(3, 3, 209.2121, 213.3964, '2026-04-20', 'active', 1, NULL, '2026-04-20 15:08:29', '2026-04-20 15:08:29'),
-(4, 4, 43.4859, 44.3556, '2026-04-20', 'active', 1, NULL, '2026-04-20 15:08:29', '2026-04-20 15:08:29'),
-(5, 5, 21.2297, 21.6543, '2026-04-20', 'active', 1, NULL, '2026-04-20 15:08:29', '2026-04-20 15:08:29'),
-(6, 6, 0.8750, 0.8950, '2026-04-20', 'active', 1, NULL, '2026-04-20 15:08:29', '2026-04-20 15:08:29'),
-(7, 7, 62.5000, 64.2000, '2026-04-20', 'active', 1, NULL, '2026-04-20 15:08:29', '2026-04-20 15:08:29'),
-(8, 8, 57.8000, 59.3000, '2026-04-20', 'active', 1, NULL, '2026-04-20 15:08:29', '2026-04-20 15:08:29'),
-(9, 9, 118.5000, 121.0000, '2026-04-20', 'active', 1, NULL, '2026-04-20 15:08:29', '2026-04-20 15:08:29'),
-(10, 10, 42.5000, 43.8000, '2026-04-20', 'active', 1, NULL, '2026-04-20 15:08:29', '2026-04-20 15:08:29'),
-(11, 11, 8.2900, 8.4558, '2026-04-20', 'active', 1, NULL, '2026-04-20 15:08:29', '2026-04-20 15:08:29'),
-(12, 12, 1.8400, 1.8768, '2026-04-20', 'active', 1, NULL, '2026-04-20 15:08:29', '2026-04-20 15:08:29');
+(1, 3, 47.1173, 46.1934, '2026-09-28', 'active', 1, 1, '2026-09-28 14:05:28', '2026-09-28 14:05:28'),
+(2, 5, 208.5728, 204.4831, '2026-09-28', 'active', 1, 1, '2026-09-28 14:05:28', '2026-09-28 14:05:28'),
+(3, 4, 190.9465, 187.2025, '2026-09-28', 'active', 1, 1, '2026-09-28 14:05:28', '2026-09-28 14:05:28'),
+(4, 2, 217.1029, 212.8460, '2026-09-28', 'active', 1, 1, '2026-09-28 14:05:28', '2026-09-28 14:05:28'),
+(5, 9, 1.0813, 1.0601, '2026-09-28', 'active', 1, 1, '2026-09-28 14:05:28', '2026-09-28 14:05:28'),
+(6, 6, 1.2355, 1.2113, '2026-09-28', 'active', 1, 1, '2026-09-28 14:05:28', '2026-09-28 14:05:28'),
+(7, 8, 15.1405, 14.8436, '2026-09-28', 'active', 1, 1, '2026-09-28 14:05:28', '2026-09-28 14:05:28'),
+(8, 1, 164.0218, 160.8057, '2026-09-28', 'active', 1, 1, '2026-09-28 14:05:28', '2026-09-28 14:05:28'),
+(9, 7, 8.8884, 8.7141, '2026-09-28', 'active', 1, 1, '2026-09-28 14:05:28', '2026-09-28 14:05:28'),
+(10, 1, 158.5000, 155.5000, '2026-09-27', 'active', 1, 1, '2026-09-28 16:56:10', '2026-09-28 16:56:10'),
+(11, 2, 220.0000, 215.5000, '2026-09-27', 'active', 1, 1, '2026-09-28 16:56:10', '2026-09-28 16:56:10');
 
 -- --------------------------------------------------------
 
@@ -138,6 +200,14 @@ CREATE TABLE `pending_changes` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `pending_changes`
+--
+
+INSERT INTO `pending_changes` (`id`, `currency_id`, `currency_name`, `currency_code`, `currency_symbol`, `currency_icon`, `sell_rate`, `buy_rate`, `effective_date`, `change_type`, `requested_by`, `approval_status`, `approved_by`, `rejection_reason`, `created_at`, `updated_at`) VALUES
+(1, 1, 'United States Dollar', 'USD', '$', 'fa-dollar-sign', 153.0501, 156.1111, '2026-09-28', 'update_rate', 1, 'pending', NULL, NULL, '2026-09-28 13:34:13', '2026-09-28 13:34:13'),
+(2, 1, 'United States Dollar', 'USD', '$', 'fa-dollar-sign', 153.0501, 156.1111, '2026-09-28', 'update_rate', 1, 'pending', NULL, NULL, '2026-09-28 13:54:49', '2026-09-28 13:54:49');
 
 -- --------------------------------------------------------
 
@@ -213,9 +283,12 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `email`, `full_name`, `role`, `is_active`, `last_login`, `created_at`, `updated_at`) VALUES
-(1, 'super', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'super@dashenbank.com', 'System Administrator', 'super_admin', 1, NULL, '2026-04-20 15:08:29', '2026-04-20 15:10:00'),
-(4, 'admin', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin@dashenbank.com', 'System Administrator', 'super_admin', 1, NULL, '2026-04-20 15:08:29', '2026-04-20 15:10:00'),
-(5, 'viewer', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'viewer@dashenbank.com', 'System Administrator', 'super_admin', 1, NULL, '2026-04-20 15:08:29', '2026-04-20 15:10:00');
+(1, 'admin', '$2a$10$OjxJqRWCFnSSYi6vI57b4eiA1f20AnNVZaCNok4ItT17olyBM7u82', 'seidm2031@gmail.com', NULL, 'super_admin', 1, '2026-09-28 16:05:18', '2026-09-28 13:15:07', '2026-09-28 16:05:18'),
+(2, 'ibd_user', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'ibd@dashenbank.com', NULL, '', 1, NULL, '2026-09-28 13:15:07', '2026-09-28 13:15:07'),
+(3, 'ibd_manager', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'ibd.manager@dashenbank.com', NULL, '', 1, NULL, '2026-09-28 13:15:07', '2026-09-28 13:15:07'),
+(4, 'ibd_officer', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'ibd.officer@dashenbank.com', NULL, '', 1, NULL, '2026-09-28 13:15:07', '2026-09-28 13:15:07'),
+(5, 'admin_user', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'adminuser@dashenbank.com', NULL, 'admin', 1, NULL, '2026-09-28 13:15:07', '2026-09-28 13:15:07'),
+(6, 'admin_tech', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'tech@dashenbank.com', NULL, 'admin', 1, NULL, '2026-09-28 13:15:07', '2026-09-28 13:15:07');
 
 -- --------------------------------------------------------
 
@@ -262,6 +335,18 @@ ALTER TABLE `activity_logs`
   ADD KEY `idx_entity` (`entity_type`,`entity_id`);
 
 --
+-- Indexes for table `branches`
+--
+ALTER TABLE `branches`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `code` (`code`),
+  ADD KEY `idx_code` (`code`),
+  ADD KEY `idx_district` (`district_id`),
+  ADD KEY `idx_grade` (`grade`),
+  ADD KEY `idx_last_heartbeat` (`last_heartbeat`),
+  ADD KEY `idx_tv_status` (`status`);
+
+--
 -- Indexes for table `currencies`
 --
 ALTER TABLE `currencies`
@@ -271,6 +356,13 @@ ALTER TABLE `currencies`
   ADD KEY `idx_code` (`code`),
   ADD KEY `idx_is_active` (`is_active`),
   ADD KEY `idx_display_order` (`display_order`);
+
+--
+-- Indexes for table `districts`
+--
+ALTER TABLE `districts`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_location_type` (`location_type`);
 
 --
 -- Indexes for table `exchange_rates`
@@ -348,22 +440,34 @@ ALTER TABLE `activity_logs`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `branches`
+--
+ALTER TABLE `branches`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+
+--
 -- AUTO_INCREMENT for table `currencies`
 --
 ALTER TABLE `currencies`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `districts`
+--
+ALTER TABLE `districts`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `exchange_rates`
 --
 ALTER TABLE `exchange_rates`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `pending_changes`
 --
 ALTER TABLE `pending_changes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `rate_history`
@@ -381,7 +485,7 @@ ALTER TABLE `settings`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `videos`
@@ -398,6 +502,12 @@ ALTER TABLE `videos`
 --
 ALTER TABLE `activity_logs`
   ADD CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `branches`
+--
+ALTER TABLE `branches`
+  ADD CONSTRAINT `branches_ibfk_1` FOREIGN KEY (`district_id`) REFERENCES `districts` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `currencies`

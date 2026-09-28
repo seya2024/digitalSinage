@@ -160,6 +160,18 @@ const TVDashboard = () => {
                         flag = currencyToFlagMap[cur.code];
                     }
 
+                  // ⭐ Compute rate direction (up / down / same)
+                    const sellToday = row.sell_rate ? parseFloat(row.sell_rate) : null;
+                    const sellPrev  = row.prev_sell_rate ? parseFloat(row.prev_sell_rate) : null;
+                    const buyToday  = row.buy_rate  ? parseFloat(row.buy_rate)  : null;
+                    const buyPrev   = row.prev_buy_rate ? parseFloat(row.prev_buy_rate) : null;
+
+                    const sellDiff = (sellToday != null && sellPrev != null) ? sellToday - sellPrev : 0;
+                    const buyDiff  = (buyToday  != null && buyPrev  != null) ? buyToday  - buyPrev  : 0;
+
+                    const sellDir = sellDiff > 0 ? 'up' : sellDiff < 0 ? 'down' : 'same';
+                    const buyDir  = buyDiff  > 0 ? 'up' : buyDiff  < 0 ? 'down' : 'same';
+                   ////////////////////////////////////
                     return {
                         id: row.id,
                         sell_rate: row.sell_rate ? parseFloat(row.sell_rate) : null,
@@ -172,6 +184,10 @@ const TVDashboard = () => {
                         _code: cur.code || 'N/A',
                         _symbol: cur.symbol || '',
                         _icon: cur.icon,
+                        _sellDir: sellDir,
+                        _buyDir:  buyDir,
+                        _sellDiff: sellDiff,
+                        _buyDiff:  buyDiff,
                     };
                 });
 
@@ -560,12 +576,26 @@ const TVDashboard = () => {
                                                         <span className="flag-icon">{item._flag}</span>
                                                         <span className="code-badge">{item._code}</span>
                                                     </td>
+
                                                     <td className="td-buy">
+                                                        <span className="rate-val rate-buy">{formatRate(item.buy_rate)}</span>
+                                                        <i className={`fas fa-arrow-${item._buyDir === 'up' ? 'up' : item._buyDir === 'down' ? 'down' : 'right'} rate-dir ${item._buyDir}`}></i>
+                                                    </td>
+                                                <td className="td-sell">
+                                                <span className="rate-val rate-sell">{formatRate(item.sell_rate)}</span>
+                                                <i 
+                                                    className={`fas fa-arrow-${item._sellDir === 'up' ? 'up' : item._sellDir === 'down' ? 'down' : 'right'} rate-dir ${item._sellDir}`}
+                                                    title={item._sellDiff !== 0 ? `${item._sellDiff > 0 ? '+' : ''}${item._sellDiff.toFixed(4)} vs yesterday` : 'No change'}
+                                                ></i>
+                                                  </td>
+
+                                                    {/* <td className="td-buy">
                                                         <span className="rate-val rate-buy">{formatRate(item.buy_rate)}</span>
                                                     </td>
                                                     <td className="td-sell">
                                                         <span className="rate-val rate-sell">{formatRate(item.sell_rate)}</span>
-                                                    </td>
+                                                    </td> */}
+
                                                 </tr>
                                             )) : (
                                                 <tr>

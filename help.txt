@@ -6,4 +6,26 @@ cd C:\xampp\htdocs\digitalSigage\frontend
 npm start
 
 
+cd C:\xampp\htdocs\digitalSigage\backend.
+npm run dev
+
 pass: admin123
+
+===================================
+
+Step 1: Find the PID on powershell
+
+Run "netstat -ano | findstr :5000 "
+
+- TCP    0.0.0.0:5000    0.0.0.0:0    LISTENING    12345
+- TCP    [::]:5000       [::]:0       LISTENING    12345
+
+Step 2: Kill that process on powershell
+
+=>> taskkill /PID 12345 /F
+
+   - Done and Fixed
+
+Step 3 Run Again Backend Server as ff
+
+   - npm run dev

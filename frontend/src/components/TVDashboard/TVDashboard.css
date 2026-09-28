@@ -633,3 +633,53 @@ html, body {
     justify-content: space-between !important;
     position: relative !important;
 }
+/* ═══════════════════════════════════════════════════════════
+   RATE DIRECTION ARROWS — ↑ ↓ →
+   ═══════════════════════════════════════════════════════════ */
+.rate-dir {
+    font-size: 14px;
+    margin-left: 8px;
+    vertical-align: middle;
+    display: inline-block;
+    font-weight: 900;
+    transition: color 0.3s ease;
+}
+
+.rate-dir.up {
+    color: #22c55e;                 /* green */
+    text-shadow: 0 0 6px rgba(34, 197, 94, 0.5);
+}
+
+.rate-dir.down {
+    color: #ef4444;                 /* red */
+    text-shadow: 0 0 6px rgba(239, 68, 68, 0.5);
+}
+
+.rate-dir.same {
+    color: #94a3b8;                 /* gray */
+    opacity: 0.5;
+}
+
+/* Optional: subtle pulse on change (only when up/down) */
+.rate-dir.up,
+.rate-dir.down {
+    animation: dirPulse 2s ease-in-out infinite;
+}
+
+@keyframes dirPulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.15); }
+}
+
+/* Scale up on bigger TVs */
+@media (min-width: 1900px) {
+    .rate-dir { font-size: 18px; }
+}
+@media (min-width: 2400px) {
+    .rate-dir { font-size: 22px; }
+}
+
+/* Phones */
+@media (max-width: 600px) {
+    .rate-dir { font-size: 11px; margin-left: 4px; }
+}
