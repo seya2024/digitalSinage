@@ -6,8 +6,6 @@ cd C:\xampp\htdocs\digitalSigage\frontend
 npm start
 
 
-cd C:\xampp\htdocs\digitalSigage\backend.
-npm run dev
 
 pass: admin123
 

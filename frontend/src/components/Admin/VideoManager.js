@@ -11,13 +11,11 @@ const API_BASE = (process.env.REACT_APP_API_URL || 'http://localhost:5000/api').
 
 /**
  * Convert a stored video_url into a fully-qualified URL.
- * - YouTube links pass through untouched.
- * - Local paths like "/uploads/xxx.mp4" get prefixed with the API base.
  */
 const getPlayableUrl = (url, type) => {
     if (!url) return '';
     if (type === 'youtube') return url;
-    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('blob:')) return url;
     if (url.startsWith('/uploads/') || url.startsWith('uploads/')) {
         const clean = url.startsWith('/') ? url : `/${url}`;
         return `${API_BASE}${clean}`;
@@ -100,7 +98,9 @@ const VideoManager = () => {
 
     const getYouTubeEmbedUrl = (url) => {
         const videoId = extractYouTubeVideoId(url);
-        if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+        if (videoId) {
+            return `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1&showinfo=0&iv_load_policy=3&cc_load_policy=0`;
+        }
         return url;
     };
 
@@ -122,7 +122,6 @@ const VideoManager = () => {
 
         setSelectedFile(file);
 
-        // For local preview only — replace with real URL after save
         setNewVideo((prev) => ({
             ...prev,
             video_url: URL.createObjectURL(file),
@@ -596,8 +595,13 @@ const VideoManager = () => {
                         <div className="video-preview">
                             <h4>Preview</h4>
                             <div className="preview-container">
-                                <video controls style={{ width: '100%', maxHeight: '300px' }}>
-                                    <source src={URL.createObjectURL(selectedFile)} type={selectedFile.type} />
+                                <video
+                                    controls
+                                    preload="metadata"
+                                    style={{ width: '100%', maxHeight: '300px' }}
+                                    key={newVideo.video_url}
+                                >
+                                    <source src={newVideo.video_url} type={selectedFile.type} />
                                     Your browser does not support the video tag.
                                 </video>
                             </div>
@@ -728,9 +732,28 @@ const VideoManager = () => {
                                             allowFullScreen
                                         ></iframe>
                                     ) : (
-                                        /* ⭐ FIXED — full URL built from API base */
-                                        <video controls key={video.id}>
+                                        /* ⭐ FIXED — shows first frame as thumbnail */
+                                        <video
+                                            controls
+                                            preload="metadata"
+                                            muted
+                                            playsInline
+                                            style={{
+                                                width: '100%',
+                                                height: '100%',
+                                                objectFit: 'cover',
+                                                background: '#000',
+                                                display: 'block'
+                                            }}
+                                            key={`video-${video.id}-${video.updated_at || ''}`}
+                                            onLoadedMetadata={(e) => {
+                                                try { e.currentTarget.currentTime = 0.1; } catch {}
+                                            }}
+                                            onError={(e) => console.error('Video thumbnail error:', video.title, e)}
+                                        >
                                             <source src={getPlayableUrl(video.video_url, 'local')} type="video/mp4" />
+                                            <source src={getPlayableUrl(video.video_url, 'local')} type="video/webm" />
+                                            <source src={getPlayableUrl(video.video_url, 'local')} type="video/ogg" />
                                             Your browser does not support the video tag.
                                         </video>
                                     )}
@@ -743,7 +766,16 @@ const VideoManager = () => {
                                 </div>
                                 <div className="video-info">
                                     <h4>{video.title}</h4>
-                                    <p>{video.description?.substring(0, 100)}</p>
+                                    <p
+                                        className="video-description"
+                                        title={video.description || 'No description'}
+                                    >
+                                        {video.description
+                                            ? (video.description.length > 100
+                                                ? `${video.description.substring(0, 100)}…`
+                                                : video.description)
+                                            : 'No description'}
+                                    </p>
                                     <div className="video-meta">
                                         <span className={`status-badge ${video.status}`}>
                                             <i className={`fas fa-${video.status === 'active' ? 'play-circle' : 'pause-circle'}`}></i>

@@ -423,3 +423,183 @@
         align-self: flex-end;
     }
 }
+/* ═══════════════════════════════════════════════════════════
+   BRANCH SELECTOR
+   ═══════════════════════════════════════════════════════════ */
+
+.preview-branch-selector {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    margin-bottom: 12px;
+}
+
+.preview-branch-selector .selector-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.preview-branch-selector label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #495057;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.preview-branch-selector label i {
+    color: #003366;
+    font-size: 0.75rem;
+}
+
+.preview-branch-selector select,
+.preview-branch-selector input {
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background: white;
+    transition: all 0.2s;
+}
+
+.preview-branch-selector select:focus,
+.preview-branch-selector input:focus {
+    outline: none;
+    border-color: #003366;
+    box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+}
+
+@media (max-width: 768px) {
+    .preview-branch-selector {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BRANCH INFO BAR
+   ═══════════════════════════════════════════════════════════ */
+
+.preview-branch-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background: linear-gradient(90deg, #eef2ff 0%, #ffffff 100%);
+    border-left: 4px solid #003366;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.preview-branch-info .branch-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    color: #003366;
+    font-size: 0.95rem;
+}
+
+.preview-branch-info .branch-name i {
+    color: #f5b642;
+}
+
+.preview-branch-info .branch-district {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.preview-branch-info .tv-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.preview-branch-info .tv-status i {
+    font-size: 0.5rem;
+}
+
+.preview-branch-info .tv-status small {
+    font-weight: 400;
+    opacity: 0.7;
+    margin-left: 4px;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.preview-branch-info .tv-status.online {
+    background: #d4edda;
+    color: #155724;
+}
+
+.preview-branch-info .tv-status.online i {
+    color: #28a745;
+}
+
+.preview-branch-info .tv-status.warning {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.preview-branch-info .tv-status.warning i {
+    color: #ffc107;
+}
+
+.preview-branch-info .tv-status.offline {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.preview-branch-info .tv-status.offline i {
+    color: #dc3545;
+}
+
+.preview-branch-info .tv-status.never {
+    background: #e9ecef;
+    color: #495057;
+}
+
+.preview-branch-info .tv-status.never i {
+    color: #6c757d;
+}
+
+@media (max-width: 768px) {
+    .preview-branch-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MINI FLAG
+   ═══════════════════════════════════════════════════════════ */
+
+.mini-flag {
+    font-size: 1.2rem;
+    margin-right: 4px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* Disabled button styling */
+.preview-actions button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
