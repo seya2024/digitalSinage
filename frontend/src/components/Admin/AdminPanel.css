@@ -1434,3 +1434,84 @@
         white-space: normal;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   LAYOUT — fixed footer, scrollable content
+   ═══════════════════════════════════════════════════════════ */
+
+/* The whole admin panel fills the viewport */
+.admin-panel-advanced {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Top bar and sidebar sit above; main layout takes remaining space */
+.admin-layout {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;      /* ⭐ critical for flex scroll */
+    overflow: hidden;
+}
+
+/* Sidebar column */
+.admin-sidebar {
+    flex-shrink: 0;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+/* Main column: header + content + footer stacked vertically */
+.admin-main {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;      /* ⭐ critical */
+    overflow: hidden;
+}
+
+/* Page header is fixed height */
+.admin-main .page-header {
+    flex-shrink: 0;
+}
+
+/* Page content scrolls internally */
+.admin-main .page-content {
+    flex: 1 1 auto;
+    min-height: 0;      /* ⭐ critical */
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 24px;  /* visual breathing room */
+}
+
+/* Footer sits at the bottom, always visible */
+.admin-main .admin-footer {
+    flex-shrink: 0;
+    background: #0f2747;
+    color: white;
+    padding: 12px 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    z-index: 5;
+}
+
+/* Prevent tab content from pushing the layout taller than the viewport */
+.admin-main .page-content > * {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Optional: custom scrollbar for the content area */
+.admin-main .page-content::-webkit-scrollbar {
+    width: 8px;
+}
+.admin-main .page-content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+}
+.admin-main .page-content::-webkit-scrollbar-thumb {
+    background: rgba(0, 51, 102, 0.3);
+    border-radius: 4px;
+}
+.admin-main .page-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 51, 102, 0.5);
+}

@@ -7,49 +7,50 @@ const VideoPlayer = ({ video }) => {
         setError(false);
     }, [video]);
 
-    // Get the API base URL from environment or fallback
-    const API_BASE = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5000';
+    const API_BASE = (process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
 
     const getYouTubeEmbedUrl = (url) => {
         if (!url) return '';
-        
-        // Handle youtube.com/watch?v=...
+
+        let videoId = null;
+
         if (url.includes('youtube.com/watch?v=')) {
-            const videoId = url.split('v=')[1].split('&')[0];
-            return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&loop=1&playlist=${videoId}`;
+            videoId = url.split('v=')[1].split('&')[0];
+        } else if (url.includes('youtu.be/')) {
+            videoId = url.split('youtu.be/')[1].split('?')[0];
+        } else if (url.includes('youtube.com/embed/')) {
+            videoId = url.split('embed/')[1].split('?')[0];
         }
-        
-        // Handle youtu.be/...
-        if (url.includes('youtu.be/')) {
-            const videoId = url.split('youtu.be/')[1].split('?')[0];
-            return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&loop=1&playlist=${videoId}`;
+
+        if (videoId) {
+            // ⭐ Clean params — no captions, no rate-limit 429, no branding
+            const params = new URLSearchParams({
+                autoplay: '1',
+                mute: '1',
+                controls: '0',
+                rel: '0',
+                modestbranding: '1',
+                loop: '1',
+                playlist: videoId,
+                showinfo: '0',
+                iv_load_policy: '3',
+                cc_load_policy: '0',     // ← disable captions (fixes 429)
+                disablekb: '1',          // ← disable keyboard shortcuts
+                fs: '0',                 // ← hide fullscreen button
+                playsinline: '1',        // ← plays inline on mobile
+            });
+            return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
         }
-        
-        // Handle youtube.com/embed/... (already embedded)
-        if (url.includes('youtube.com/embed/')) {
-            const videoId = url.split('embed/')[1].split('?')[0];
-            return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&loop=1&playlist=${videoId}`;
-        }
-        
         return url;
     };
 
     const getLocalVideoUrl = (url) => {
         if (!url) return '';
-        
-        // Already a full URL
-        if (url.startsWith('http://') || url.startsWith('https://')) {
+        if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('blob:')) {
             return url;
         }
-        
-        // Starts with /uploads/ or uploads/ → prepend API base
-        if (url.startsWith('/uploads/') || url.startsWith('uploads/')) {
-            const cleanPath = url.startsWith('/') ? url : `/${url}`;
-            return `${API_BASE}${cleanPath}`;
-        }
-        
-        // Relative path → prepend API base
-        return `${API_BASE}/${url}`;
+        const cleanPath = url.startsWith('/') ? url : `/${url}`;
+        return `${API_BASE}${cleanPath}`;
     };
 
     if (!video) {
@@ -87,23 +88,25 @@ const VideoPlayer = ({ video }) => {
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     key={video.id}
                 >
-                    <source 
-                        src={getLocalVideoUrl(video.video_url || video.file_path)} 
-                        type="video/mp4" 
-                    />
+                    <source src={getLocalVideoUrl(video.video_url || video.file_path)} type="video/mp4" />
+                    <source src={getLocalVideoUrl(video.video_url || video.file_path)} type="video/webm" />
+                    <source src={getLocalVideoUrl(video.video_url || video.file_path)} type="video/ogg" />
                     Your browser does not support the video tag.
                 </video>
             ) : (
-                <iframe
-                    src={getYouTubeEmbedUrl(video.video_url)}
-                    title={video.title || 'Promotional Video'}
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    onError={() => setError(true)}
-                ></iframe>
+                <div className="youtube-fill-wrapper">
+                    <iframe
+                        className="youtube-fill-iframe"
+                        src={getYouTubeEmbedUrl(video.video_url)}
+                        title={video.title || 'Promotional Video'}
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        onError={() => setError(true)}
+                    ></iframe>
+                </div>
             )}
-            
+
             {video.title && (
                 <div className="video-title">
                     <h3>{video.title}</h3>

@@ -5,7 +5,6 @@ import { videoService } from '../../services/videoService';
 import { branchService } from '../../services/branchService';
 import './TVDashboard.css';
 import api from '../../services/api';
-// import * as Flags from 'country-flag-icons/react/3x2';
 
 /* ═══════════════════════════════════════════════════════════
    FLAG HELPERS
@@ -21,9 +20,6 @@ const countryCodeToFlag = (code) => {
         return '💱';
     }
 };
-
-
-
 
 const currencyToFlagMap = {
     'USD': '🇺🇸', 'EUR': '🇪🇺', 'GBP': '🇬🇧', 'SAR': '🇸🇦',
@@ -71,7 +67,7 @@ const TVDashboard = () => {
 
     const [showTransition, setShowTransition] = useState(false);
 
-    // ⭐ Branch state
+    // Branch state
     const [branch, setBranch] = useState(null);
 
     // Auto-scroll refs
@@ -110,7 +106,6 @@ const TVDashboard = () => {
         };
         loadBranch();
 
-        // Refresh branch info every 5 minutes (message updates)
         const branchInterval = setInterval(loadBranch, 300000);
         return () => clearInterval(branchInterval);
     }, [branchCode]);
@@ -164,18 +159,18 @@ const TVDashboard = () => {
                         flag = currencyToFlagMap[cur.code];
                     }
 
-                  // ⭐ Compute rate direction (up / down / same)
+                    // Rate direction (up / down / same)
                     const sellToday = row.sell_rate ? parseFloat(row.sell_rate) : null;
                     const sellPrev  = row.prev_sell_rate ? parseFloat(row.prev_sell_rate) : null;
-                    const buyToday  = row.buy_rate  ? parseFloat(row.buy_rate)  : null;
+                    const buyToday  = row.buy_rate ? parseFloat(row.buy_rate) : null;
                     const buyPrev   = row.prev_buy_rate ? parseFloat(row.prev_buy_rate) : null;
 
-                    const sellDiff = (sellToday != null && sellPrev != null) ? sellToday - sellPrev : 0;
-                    const buyDiff  = (buyToday  != null && buyPrev  != null) ? buyToday  - buyPrev  : 0;
+                    const sellDiff = (sellToday != null && sellPrev != null) ? sellToday - sellPrev : null;
+                    const buyDiff  = (buyToday != null && buyPrev != null) ? buyToday - buyPrev : null;
 
-                    const sellDir = sellDiff > 0 ? 'up' : sellDiff < 0 ? 'down' : 'same';
-                    const buyDir  = buyDiff  > 0 ? 'up' : buyDiff  < 0 ? 'down' : 'same';
-                   ////////////////////////////////////
+                    const sellDir = sellDiff == null ? 'same' : sellDiff > 0 ? 'up' : sellDiff < 0 ? 'down' : 'same';
+                    const buyDir  = buyDiff == null ? 'same' : buyDiff > 0 ? 'up' : buyDiff < 0 ? 'down' : 'same';
+
                     return {
                         id: row.id,
                         sell_rate: row.sell_rate ? parseFloat(row.sell_rate) : null,
@@ -184,14 +179,15 @@ const TVDashboard = () => {
                         status: row.status || 'active',
                         updated_at: row.updated_at || '',
                         _flag: flag,
+                        _countryCode: cur.countryCode || '',
                         _name: cur.name || cur.code || 'Unknown',
                         _code: cur.code || 'N/A',
                         _symbol: cur.symbol || '',
                         _icon: cur.icon,
                         _sellDir: sellDir,
-                        _buyDir:  buyDir,
+                        _buyDir: buyDir,
                         _sellDiff: sellDiff,
-                        _buyDiff:  buyDiff,
+                        _buyDiff: buyDiff,
                     };
                 });
 
@@ -210,7 +206,7 @@ const TVDashboard = () => {
                     }
                 }
 
-                // ⭐ SAVE TO CACHE
+                // SAVE TO CACHE
                 try {
                     localStorage.setItem('dashen_tv_cache', JSON.stringify({
                         currencies: formattedRates,
@@ -238,7 +234,7 @@ const TVDashboard = () => {
             setConnectionStatus('error');
             setRetryCount(prev => prev + 1);
 
-            // ⭐ LOAD FROM CACHE
+            // LOAD FROM CACHE
             console.log('🔄 Attempting to load from cache...');
             try {
                 const cached = localStorage.getItem('dashen_tv_cache');
@@ -349,7 +345,7 @@ const TVDashboard = () => {
         return () => cancelAnimationFrame(scrollAnimRef.current);
     }, [isAutoScrolling, startAutoScroll]);
 
-    /* ⭐ Helper — formats seconds into "5m ago" / "2h ago" */
+    /* Helper — formats seconds into "5m ago" / "2h ago" */
     const formatCacheAge = (seconds) => {
         if (!seconds) return 'just now';
         if (seconds < 60) return `${seconds}s ago`;
@@ -470,7 +466,7 @@ const TVDashboard = () => {
                 </div>
             </header>
 
-            {/* ⭐ Red Warning — Unknown / Missing Branch */}
+            {/* Red Warning — Unknown / Missing Branch */}
             {!branch && (
                 <div className="tv-warning-bar">
                     <i className="fas fa-exclamation-triangle"></i>
@@ -482,7 +478,7 @@ const TVDashboard = () => {
                 </div>
             )}
 
-            {/* ⭐ Offline Mode Banner */}
+            {/* Offline Mode Banner */}
             {usingCache && (
                 <div className="tv-offline-bar">
                     <i className="fas fa-wifi"></i>
@@ -550,7 +546,6 @@ const TVDashboard = () => {
                                 </div>
                             </div>
 
-                         { /* Split screen */}  
                             <div className="rates-table-wrapper">
                                 <div
                                     className="rates-table-body"
@@ -560,8 +555,8 @@ const TVDashboard = () => {
                                         if (isAutoScrolling && scrollEnabledRef.current) startAutoScroll();
                                     }}
                                     onWheel={() => pauseAutoScroll(12000)}
-                                    onTouchStart={() => pauseAutoScroll(12000)}>
-
+                                    onTouchStart={() => pauseAutoScroll(12000)}
+                                >
                                     <table className="rates-table">
                                         <thead>
                                             <tr>
@@ -581,26 +576,21 @@ const TVDashboard = () => {
                                                         <span className="flag-icon">{item._flag}</span>
                                                         <span className="code-badge">{item._code}</span>
                                                     </td>
-
                                                     <td className="td-buy">
                                                         <span className="rate-val rate-buy">{formatRate(item.buy_rate)}</span>
                                                         <i className={`fas fa-arrow-${item._buyDir === 'up' ? 'up' : item._buyDir === 'down' ? 'down' : 'right'} rate-dir ${item._buyDir}`}></i>
                                                     </td>
-                                                <td className="td-sell">
-                                                <span className="rate-val rate-sell">{formatRate(item.sell_rate)}</span>
-                                                <i 
-                                                    className={`fas fa-arrow-${item._sellDir === 'up' ? 'up' : item._sellDir === 'down' ? 'down' : 'right'} rate-dir ${item._sellDir}`}
-                                                    title={item._sellDiff !== 0 ? `${item._sellDiff > 0 ? '+' : ''}${item._sellDiff.toFixed(4)} vs yesterday` : 'No change'}
-                                                ></i>
-                                                  </td>
-
-                                                    {/* <td className="td-buy">
-                                                        <span className="rate-val rate-buy">{formatRate(item.buy_rate)}</span>
-                                                    </td>
                                                     <td className="td-sell">
                                                         <span className="rate-val rate-sell">{formatRate(item.sell_rate)}</span>
-                                                    </td> */}
-
+                                                        <i
+                                                            className={`fas fa-arrow-${item._sellDir === 'up' ? 'up' : item._sellDir === 'down' ? 'down' : 'right'} rate-dir ${item._sellDir}`}
+                                                            title={
+                                                                (typeof item._sellDiff === 'number' && item._sellDiff !== 0)
+                                                                    ? `${item._sellDiff > 0 ? '+' : ''}${item._sellDiff.toFixed(4)} vs yesterday`
+                                                                    : 'No change'
+                                                            }
+                                                        ></i>
+                                                    </td>
                                                 </tr>
                                             )) : (
                                                 <tr>
@@ -614,8 +604,6 @@ const TVDashboard = () => {
                                             )}
                                         </tbody>
                                     </table>
-
-
                                 </div>
                             </div>
                         </div>
@@ -701,7 +689,7 @@ const TVDashboard = () => {
                     <div className={`brand-logo ${!branch ? 'unknown-branch' : ''}`}>
                         <i className={`fas ${!branch ? 'fa-exclamation-triangle' : 'fa-map-marker-alt'}`}></i>
                         <span className="brand-name">
-                            {branch?.name || (branchCode ? `Unknown: ${branchCode}` : '')}  {/* Unknown branch */}
+                            {branch?.name || (branchCode ? `Unknown: ${branchCode}` : '')}
                         </span>
                     </div>
                     {branch?.district_name && (
@@ -728,11 +716,16 @@ const TVDashboard = () => {
                         </div>
                     </div>
 
+                    {/* ⭐ Ticker — 4 copies so it scrolls smoothly on any screen width */}
                     <div className="ticker-track">
-                        <div className="ticker-content">
-                            {[...footerMessages, ...footerMessages].map((msg, i) => (
+                        <div className="ticker-marquee">
+                            {[
+                                ...footerMessages,
+                                ...footerMessages,
+                                ...footerMessages,
+                                ...footerMessages,
+                            ].map((msg, i) => (
                                 <span key={i} className="ticker-item">
-                                    <i className={`fas ${msg.icon}`}></i>
                                     <span className="ticker-separator">✦</span>
                                     {msg.text}
                                 </span>
