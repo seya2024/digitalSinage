@@ -1,5 +1,6 @@
 const express = require('express');
-const { protect, superAdminOnly } = require('../middleware/authMiddleware');
+const router = express.Router();
+const { protect, adminOnly } = require('../middleware/authMiddleware');
 const {
     getVideos,
     getActiveVideo,
@@ -7,17 +8,15 @@ const {
     updateVideo,
     deleteVideo
 } = require('../controllers/videoController');
+const upload = require('../middleware/upload');         // ⭐ REQUIRED for file uploads
 
-const router = express.Router();
-
+/* ─── Public routes ─── */
 router.get('/', getVideos);
 router.get('/active', getActiveVideo);
 
-router.post('/', protect, superAdminOnly, createVideo);
-router.put('/:id', protect, superAdminOnly, updateVideo);
-router.delete('/:id', protect, superAdminOnly, deleteVideo);
-
-const path = require('path');
-router.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+/* ─── Admin routes with multer for file uploads ─── */
+router.post('/', protect, adminOnly, upload.single('video'), createVideo);    // ⭐ multer here
+router.put('/:id', protect, adminOnly, upload.single('video'), updateVideo);  // ⭐ and here
+router.delete('/:id', protect, adminOnly, deleteVideo);
 
 module.exports = router;

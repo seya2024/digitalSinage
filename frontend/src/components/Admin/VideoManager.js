@@ -6,6 +6,25 @@ import ConfirmModal from '../common/ConfirmModal';
 import Alert from '../common/Alert';
 import './VideoManager.css';
 
+/* ⭐ API base URL — used to build full URLs for local videos */
+const API_BASE = (process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
+
+/**
+ * Convert a stored video_url into a fully-qualified URL.
+ * - YouTube links pass through untouched.
+ * - Local paths like "/uploads/xxx.mp4" get prefixed with the API base.
+ */
+const getPlayableUrl = (url, type) => {
+    if (!url) return '';
+    if (type === 'youtube') return url;
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    if (url.startsWith('/uploads/') || url.startsWith('uploads/')) {
+        const clean = url.startsWith('/') ? url : `/${url}`;
+        return `${API_BASE}${clean}`;
+    }
+    return `${API_BASE}/${url}`;
+};
+
 const VideoManager = () => {
     const [videos, setVideos] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -15,8 +34,7 @@ const VideoManager = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [uploading, setUploading] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
-    
-    // Confirm modal state
+
     const [confirmModal, setConfirmModal] = useState({
         isOpen: false,
         type: '',
@@ -29,7 +47,7 @@ const VideoManager = () => {
         confirmVariant: '',
         icon: ''
     });
-    
+
     const [newVideo, setNewVideo] = useState({
         title: '',
         description: '',
@@ -69,6 +87,7 @@ const VideoManager = () => {
         setTimeout(() => setMessage({ type: '', text: '' }), 5000);
     };
 
+    /* ─── YouTube helpers ─── */
     const validateYouTubeUrl = (url) => {
         const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/(watch\?v=|embed\/|v\/)?([a-zA-Z0-9_-]{11})/;
         return youtubeRegex.test(url);
@@ -81,53 +100,43 @@ const VideoManager = () => {
 
     const getYouTubeEmbedUrl = (url) => {
         const videoId = extractYouTubeVideoId(url);
-        if (videoId) {
-            return `https://www.youtube.com/embed/${videoId}`;
-        }
+        if (videoId) return `https://www.youtube.com/embed/${videoId}`;
         return url;
     };
 
+    /* ─── File select ─── */
     const handleFileSelect = (e) => {
         const file = e.target.files[0];
-        if (file) {
-            const allowedTypes = ['video/mp4', 'video/webm', 'video/ogg'];
-            if (!allowedTypes.includes(file.type)) {
-                showMessage('error', 'Only MP4, WebM, and OGG video files are allowed');
-                return;
-            }
-            
-            if (file.size > 100 * 1024 * 1024) {
-                showMessage('error', 'File size must be less than 100MB');
-                return;
-            }
-            
-            setSelectedFile(file);
-            const previewUrl = URL.createObjectURL(file);
-            setNewVideo({
-                ...newVideo,
-                video_url: previewUrl,
-                video_type: 'local'
-            });
+        if (!file) return;
+
+        const allowedTypes = ['video/mp4', 'video/webm', 'video/ogg'];
+        if (!allowedTypes.includes(file.type)) {
+            showMessage('error', 'Only MP4, WebM, and OGG video files are allowed');
+            return;
         }
+
+        if (file.size > 100 * 1024 * 1024) {
+            showMessage('error', 'File size must be less than 100MB');
+            return;
+        }
+
+        setSelectedFile(file);
+
+        // For local preview only — replace with real URL after save
+        setNewVideo((prev) => ({
+            ...prev,
+            video_url: URL.createObjectURL(file),
+            video_type: 'local'
+        }));
     };
 
+    /* ─── Add video ─── */
     const handleAddVideo = async () => {
-        // Validation
-
-        // if (!newVideo.title || newVideo.title.trim() === '') {
-
-        //     showMessage('error', 'Please enter a video title');
-        //     return;
-        // }
-
-        // Trim title to remove extra spaces
-    const trimmedTitle = newVideo.title.trim();
-    
-    if (!trimmedTitle) {
-        showMessage('error', 'Please enter a video title');
-        return;
-    }
-
+        const trimmedTitle = newVideo.title.trim();
+        if (!trimmedTitle) {
+            showMessage('error', 'Please enter a video title');
+            return;
+        }
 
         if (newVideo.video_type === 'youtube') {
             if (!newVideo.video_url || newVideo.video_url.trim() === '') {
@@ -135,7 +144,7 @@ const VideoManager = () => {
                 return;
             }
             if (!validateYouTubeUrl(newVideo.video_url)) {
-                showMessage('error', 'Please enter a valid YouTube URL (e.g., https://www.youtube.com/watch?v=... or https://youtu.be/...)');
+                showMessage('error', 'Please enter a valid YouTube URL');
                 return;
             }
         }
@@ -149,29 +158,26 @@ const VideoManager = () => {
 
         try {
             let response;
-            
+
             if (newVideo.video_type === 'local' && selectedFile) {
-                // Prepare FormData for file upload
                 const formData = new FormData();
-                formData.append('title', newVideo.title.trim());
+                formData.append('title', trimmedTitle);
                 formData.append('description', newVideo.description || '');
                 formData.append('video_type', 'local');
                 formData.append('status', newVideo.status);
-                formData.append('display_order', newVideo.display_order.toString());
+                formData.append('display_order', String(newVideo.display_order || 0));
                 formData.append('start_date', newVideo.start_date || '');
                 formData.append('end_date', newVideo.end_date || '');
                 formData.append('video', selectedFile);
-                
-                // Log FormData contents for debugging
+
                 for (let pair of formData.entries()) {
                     console.log('FormData:', pair[0], pair[1] instanceof File ? pair[1].name : pair[1]);
                 }
-                
+
                 response = await videoService.createWithFile(formData);
             } else {
-                // Prepare JSON data for YouTube video
                 const videoData = {
-                    title: newVideo.title.trim(),
+                    title: trimmedTitle,
                     description: newVideo.description || '',
                     video_url: newVideo.video_url.trim(),
                     video_type: 'youtube',
@@ -181,13 +187,9 @@ const VideoManager = () => {
                     start_date: newVideo.start_date || null,
                     end_date: newVideo.end_date || null
                 };
-                
-                console.log('Sending YouTube video data:', videoData);
                 response = await videoService.create(videoData);
             }
-            
-            console.log('API Response:', response);
-            
+
             if (response && response.success) {
                 showMessage('success', 'Video added successfully');
                 setShowAddForm(false);
@@ -203,39 +205,27 @@ const VideoManager = () => {
                     end_date: ''
                 });
                 setSelectedFile(null);
-                await loadVideos(); // Refresh the list
+                await loadVideos();
             } else {
-                // Show specific error message from server
-                const errorMsg = response?.message || 'Failed to add video. Please check all fields and try again.';
-                console.error('Server returned error:', errorMsg);
-                showMessage('error', errorMsg);
+                showMessage('error', response?.message || 'Failed to add video');
             }
         } catch (error) {
             console.error('Add video error:', error);
-            
-            // Handle different error types
             let errorMsg = 'Failed to add video. ';
-            
             if (error.response) {
-                // Server responded with error
-                console.error('Error response data:', error.response.data);
-                console.error('Error status:', error.response.status);
                 errorMsg += error.response.data?.message || `Server error: ${error.response.status}`;
             } else if (error.request) {
-                // Request was made but no response
-                console.error('No response from server:', error.request);
                 errorMsg += 'No response from server. Please check if backend is running.';
             } else {
-                // Other error
                 errorMsg += error.message || 'Unknown error occurred.';
             }
-            
             showMessage('error', errorMsg);
         } finally {
             setUploading(false);
         }
     };
 
+    /* ─── Update video ─── */
     const handleUpdateVideo = async () => {
         if (!editingVideo.title || editingVideo.title.trim() === '') {
             showMessage('error', 'Please enter a video title');
@@ -259,13 +249,13 @@ const VideoManager = () => {
                 start_date: editingVideo.start_date || null,
                 end_date: editingVideo.end_date || null
             };
-            
+
             if (editingVideo.video_type === 'youtube') {
                 updateData.video_url = editingVideo.video_url.trim();
             }
-            
+
             const response = await videoService.update(editingVideo.id, updateData);
-            
+
             if (response && response.success) {
                 showMessage('success', 'Video updated successfully');
                 setEditingVideo(null);
@@ -279,6 +269,7 @@ const VideoManager = () => {
         }
     };
 
+    /* ─── Delete ─── */
     const handleDeleteClick = (id, title) => {
         setConfirmModal({
             isOpen: true,
@@ -311,16 +302,17 @@ const VideoManager = () => {
         }
     };
 
+    /* ─── Toggle status ─── */
     const handleToggleClick = (video) => {
         const newStatus = video.status === 'active' ? 'inactive' : 'active';
         const action = newStatus === 'active' ? 'enable' : 'disable';
-        
+
         setConfirmModal({
             isOpen: true,
             type: 'toggle',
             videoId: video.id,
             videoTitle: video.title,
-            newStatus: newStatus,
+            newStatus,
             title: `${action === 'enable' ? 'Enable' : 'Disable'} Video`,
             message: `Are you sure you want to ${action} "${video.title}"?`,
             confirmText: `Yes, ${action === 'enable' ? 'Enable' : 'Disable'}`,
@@ -332,7 +324,7 @@ const VideoManager = () => {
     const handleToggleStatus = async () => {
         const { videoId, newStatus } = confirmModal;
         const action = newStatus === 'active' ? 'enable' : 'disable';
-        
+
         try {
             const response = await videoService.toggleStatus(videoId, newStatus);
             if (response && response.success) {
@@ -420,7 +412,7 @@ const VideoManager = () => {
                 </div>
             </div>
 
-            {/* Add Video Modal */}
+            {/* ─── Add Video Modal ─── */}
             <Modal
                 isOpen={showAddForm}
                 onClose={() => {
@@ -461,12 +453,12 @@ const VideoManager = () => {
                             <input
                                 type="text"
                                 value={newVideo.title}
-                                onChange={(e) => setNewVideo({...newVideo, title: e.target.value})}
+                                onChange={(e) => setNewVideo({ ...newVideo, title: e.target.value })}
                                 placeholder="Enter video title"
                             />
                         </div>
                     </div>
-                    
+
                     <div className="form-row">
                         <div className="form-group full-width">
                             <label>Video Source *</label>
@@ -475,7 +467,7 @@ const VideoManager = () => {
                                     type="button"
                                     className={`source-tab ${newVideo.video_type === 'youtube' ? 'active' : ''}`}
                                     onClick={() => {
-                                        setNewVideo({...newVideo, video_type: 'youtube', video_url: ''});
+                                        setNewVideo({ ...newVideo, video_type: 'youtube', video_url: '' });
                                         setSelectedFile(null);
                                     }}
                                 >
@@ -485,7 +477,7 @@ const VideoManager = () => {
                                     type="button"
                                     className={`source-tab ${newVideo.video_type === 'local' ? 'active' : ''}`}
                                     onClick={() => {
-                                        setNewVideo({...newVideo, video_type: 'local', video_url: ''});
+                                        setNewVideo({ ...newVideo, video_type: 'local', video_url: '' });
                                     }}
                                 >
                                     <i className="fas fa-upload"></i> Upload Video
@@ -502,7 +494,7 @@ const VideoManager = () => {
                                     type="url"
                                     placeholder="https://www.youtube.com/watch?v=..."
                                     value={newVideo.video_url}
-                                    onChange={(e) => setNewVideo({...newVideo, video_url: e.target.value})}
+                                    onChange={(e) => setNewVideo({ ...newVideo, video_url: e.target.value })}
                                 />
                                 <small className="field-hint">
                                     Enter a YouTube video URL (e.g., https://www.youtube.com/watch?v=VIDEO_ID)
@@ -539,19 +531,19 @@ const VideoManager = () => {
                             <textarea
                                 rows="3"
                                 value={newVideo.description}
-                                onChange={(e) => setNewVideo({...newVideo, description: e.target.value})}
+                                onChange={(e) => setNewVideo({ ...newVideo, description: e.target.value })}
                                 placeholder="Enter video description (optional)"
                             />
                         </div>
                     </div>
-                    
+
                     <div className="form-row">
                         <div className="form-group">
                             <label>Display Order</label>
                             <input
                                 type="number"
                                 value={newVideo.display_order}
-                                onChange={(e) => setNewVideo({...newVideo, display_order: parseInt(e.target.value) || 0})}
+                                onChange={(e) => setNewVideo({ ...newVideo, display_order: parseInt(e.target.value) || 0 })}
                                 placeholder="0"
                             />
                         </div>
@@ -559,7 +551,7 @@ const VideoManager = () => {
                             <label>Status</label>
                             <select
                                 value={newVideo.status}
-                                onChange={(e) => setNewVideo({...newVideo, status: e.target.value})}
+                                onChange={(e) => setNewVideo({ ...newVideo, status: e.target.value })}
                             >
                                 <option value="active">Active (Show on TV)</option>
                                 <option value="inactive">Inactive (Hidden)</option>
@@ -573,7 +565,7 @@ const VideoManager = () => {
                             <input
                                 type="date"
                                 value={newVideo.start_date}
-                                onChange={(e) => setNewVideo({...newVideo, start_date: e.target.value})}
+                                onChange={(e) => setNewVideo({ ...newVideo, start_date: e.target.value })}
                             />
                         </div>
                         <div className="form-group">
@@ -581,7 +573,7 @@ const VideoManager = () => {
                             <input
                                 type="date"
                                 value={newVideo.end_date}
-                                onChange={(e) => setNewVideo({...newVideo, end_date: e.target.value})}
+                                onChange={(e) => setNewVideo({ ...newVideo, end_date: e.target.value })}
                             />
                         </div>
                     </div>
@@ -614,7 +606,7 @@ const VideoManager = () => {
                 </div>
             </Modal>
 
-            {/* Edit Video Modal */}
+            {/* ─── Edit Video Modal ─── */}
             <Modal
                 isOpen={!!editingVideo}
                 onClose={() => setEditingVideo(null)}
@@ -639,7 +631,7 @@ const VideoManager = () => {
                                 <input
                                     type="text"
                                     value={editingVideo.title}
-                                    onChange={(e) => setEditingVideo({...editingVideo, title: e.target.value})}
+                                    onChange={(e) => setEditingVideo({ ...editingVideo, title: e.target.value })}
                                 />
                             </div>
                         </div>
@@ -651,37 +643,37 @@ const VideoManager = () => {
                                     <input
                                         type="url"
                                         value={editingVideo.video_url}
-                                        onChange={(e) => setEditingVideo({...editingVideo, video_url: e.target.value})}
+                                        onChange={(e) => setEditingVideo({ ...editingVideo, video_url: e.target.value })}
                                     />
                                 </div>
                             </div>
                         )}
-                        
+
                         <div className="form-row">
                             <div className="form-group full-width">
                                 <label>Description</label>
                                 <textarea
                                     rows="3"
                                     value={editingVideo.description || ''}
-                                    onChange={(e) => setEditingVideo({...editingVideo, description: e.target.value})}
+                                    onChange={(e) => setEditingVideo({ ...editingVideo, description: e.target.value })}
                                 />
                             </div>
                         </div>
-                        
+
                         <div className="form-row">
                             <div className="form-group">
                                 <label>Display Order</label>
                                 <input
                                     type="number"
                                     value={editingVideo.display_order || 0}
-                                    onChange={(e) => setEditingVideo({...editingVideo, display_order: parseInt(e.target.value) || 0})}
+                                    onChange={(e) => setEditingVideo({ ...editingVideo, display_order: parseInt(e.target.value) || 0 })}
                                 />
                             </div>
                             <div className="form-group">
                                 <label>Status</label>
                                 <select
                                     value={editingVideo.status}
-                                    onChange={(e) => setEditingVideo({...editingVideo, status: e.target.value})}
+                                    onChange={(e) => setEditingVideo({ ...editingVideo, status: e.target.value })}
                                 >
                                     <option value="active">Active (Show on TV)</option>
                                     <option value="inactive">Inactive (Hidden)</option>
@@ -706,7 +698,7 @@ const VideoManager = () => {
                 )}
             </Modal>
 
-            {/* Videos Grid */}
+            {/* ─── Videos Grid ─── */}
             {videos.length === 0 ? (
                 <div className="empty-state">
                     <i className="fas fa-video-slash"></i>
@@ -719,7 +711,7 @@ const VideoManager = () => {
             ) : (
                 <div className="videos-grid">
                     {videos
-                        .filter(video => 
+                        .filter(video =>
                             video && (
                                 video.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                                 video.description?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -736,8 +728,9 @@ const VideoManager = () => {
                                             allowFullScreen
                                         ></iframe>
                                     ) : (
-                                        <video controls>
-                                            <source src={`http://localhost:5000${video.video_url}`} />
+                                        /* ⭐ FIXED — full URL built from API base */
+                                        <video controls key={video.id}>
+                                            <source src={getPlayableUrl(video.video_url, 'local')} type="video/mp4" />
                                             Your browser does not support the video tag.
                                         </video>
                                     )}
@@ -785,7 +778,7 @@ const VideoManager = () => {
                 </div>
             )}
 
-            {/* Confirm Modal */}
+            {/* ─── Confirm Modal ─── */}
             <ConfirmModal
                 isOpen={confirmModal.isOpen}
                 onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
@@ -798,7 +791,7 @@ const VideoManager = () => {
                 icon={confirmModal.icon}
             />
 
-            {/* Info Box */}
+            {/* ─── Info Box ─── */}
             <div className="info-box">
                 <i className="fas fa-info-circle"></i>
                 <div className="info-content">

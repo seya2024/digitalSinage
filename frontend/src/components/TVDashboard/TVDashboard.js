@@ -546,6 +546,7 @@ const TVDashboard = () => {
                                 </div>
                             </div>
 
+                         { /* Split screen */}  
                             <div className="rates-table-wrapper">
                                 <div
                                     className="rates-table-body"
@@ -609,6 +610,8 @@ const TVDashboard = () => {
                                             )}
                                         </tbody>
                                     </table>
+
+                                    
                                 </div>
                             </div>
                         </div>
@@ -694,7 +697,7 @@ const TVDashboard = () => {
                     <div className={`brand-logo ${!branch ? 'unknown-branch' : ''}`}>
                         <i className={`fas ${!branch ? 'fa-exclamation-triangle' : 'fa-map-marker-alt'}`}></i>
                         <span className="brand-name">
-                            {branch?.name || (branchCode ? `Unknown: ${branchCode}` : 'Unknown Branch')}
+                            {branch?.name || (branchCode ? `Unknown: ${branchCode}` : '')}  {/* Unknown branch */}
                         </span>
                     </div>
                     {branch?.district_name && (

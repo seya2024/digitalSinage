@@ -1,76 +1,55 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './VideoPlayer.css';
+import React, { useState, useEffect } from 'react';
 
 const VideoPlayer = ({ video }) => {
     const [error, setError] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-    const containerRef = useRef(null);
-    const iframeRef = useRef(null);
 
     useEffect(() => {
-        setIsLoading(true);
         setError(false);
-        
-        // Force iframe to fill container
-        const updateIframeSize = () => {
-            if (iframeRef.current && containerRef.current) {
-                const container = containerRef.current;
-                iframeRef.current.style.width = `${container.clientWidth}px`;
-                iframeRef.current.style.height = `${container.clientHeight}px`;
-            }
-        };
-        
-        updateIframeSize();
-        window.addEventListener('resize', updateIframeSize);
-        
-        return () => window.removeEventListener('resize', updateIframeSize);
     }, [video]);
 
-    const getVideoUrl = (url, type) => {
+    // Get the API base URL from environment or fallback
+    const API_BASE = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5000';
+
+    const getYouTubeEmbedUrl = (url) => {
         if (!url) return '';
         
-        // Extract video ID from YouTube URL
-        const getYouTubeVideoId = (url) => {
-            const patterns = [
-                /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/,
-                /youtube\.com\/embed\/([^&\n?#]+)/,
-                /youtube\.com\/v\/([^&\n?#]+)/
-            ];
-            
-            for (const pattern of patterns) {
-                const match = url.match(pattern);
-                if (match) return match[1];
-            }
-            return null;
-        };
-
-        if (type === 'youtube') {
-            const videoId = getYouTubeVideoId(url);
-            if (videoId) {
-                // YouTube embed parameters for full screen display
-                return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=1&rel=0&modestbranding=1&showinfo=0&iv_load_policy=3&fs=1&loop=1&playlist=${videoId}&enablejsapi=1&origin=${window.location.origin}&widgetid=1`;
-            }
-            return url;
+        // Handle youtube.com/watch?v=...
+        if (url.includes('youtube.com/watch?v=')) {
+            const videoId = url.split('v=')[1].split('&')[0];
+            return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&loop=1&playlist=${videoId}`;
         }
         
-        if (type === 'vimeo') {
-            const vimeoId = url.match(/vimeo\.com\/(\d+)/)?.[1];
-            if (vimeoId) {
-                return `https://player.vimeo.com/video/${vimeoId}?autoplay=1&title=0&byline=0&portrait=0&fullscreen=1`;
-            }
-            return url;
+        // Handle youtu.be/...
+        if (url.includes('youtu.be/')) {
+            const videoId = url.split('youtu.be/')[1].split('?')[0];
+            return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&loop=1&playlist=${videoId}`;
+        }
+        
+        // Handle youtube.com/embed/... (already embedded)
+        if (url.includes('youtube.com/embed/')) {
+            const videoId = url.split('embed/')[1].split('?')[0];
+            return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&loop=1&playlist=${videoId}`;
         }
         
         return url;
     };
 
-    const handleLoad = () => {
-        setIsLoading(false);
-    };
-
-    const handleError = () => {
-        setError(true);
-        setIsLoading(false);
+    const getLocalVideoUrl = (url) => {
+        if (!url) return '';
+        
+        // Already a full URL
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            return url;
+        }
+        
+        // Starts with /uploads/ or uploads/ → prepend API base
+        if (url.startsWith('/uploads/') || url.startsWith('uploads/')) {
+            const cleanPath = url.startsWith('/') ? url : `/${url}`;
+            return `${API_BASE}${cleanPath}`;
+        }
+        
+        // Relative path → prepend API base
+        return `${API_BASE}/${url}`;
     };
 
     if (!video) {
@@ -93,38 +72,40 @@ const VideoPlayer = ({ video }) => {
         );
     }
 
-    const videoUrl = getVideoUrl(video.video_url, video.video_type);
+    const isLocal = video.video_type === 'local';
 
     return (
-        <div className="video-player-container" ref={containerRef}>
-            {isLoading && (
-                <div className="video-loading">
-                    <div className="spinner"></div>
-                    <p>Loading video...</p>
-                </div>
+        <div className="video-container">
+            {isLocal ? (
+                <video
+                    controls
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    onError={() => setError(true)}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    key={video.id}
+                >
+                    <source 
+                        src={getLocalVideoUrl(video.video_url || video.file_path)} 
+                        type="video/mp4" 
+                    />
+                    Your browser does not support the video tag.
+                </video>
+            ) : (
+                <iframe
+                    src={getYouTubeEmbedUrl(video.video_url)}
+                    title={video.title || 'Promotional Video'}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    onError={() => setError(true)}
+                ></iframe>
             )}
-            <iframe
-                ref={iframeRef}
-                src={videoUrl}
-                title={video.title || 'Promotional Video'}
-                className="video-iframe"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                allowFullScreen
-                onLoad={handleLoad}
-                onError={handleError}
-                style={{
-                    opacity: isLoading ? 0 : 1,
-                    transition: 'opacity 0.3s ease',
-                    width: '100%',
-                    height: '100%',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0
-                }}
-            />
+            
             {video.title && (
-                <div className="video-overlay">
+                <div className="video-title">
                     <h3>{video.title}</h3>
                     {video.description && <p>{video.description}</p>}
                 </div>
